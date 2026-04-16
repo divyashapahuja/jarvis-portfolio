@@ -1,0 +1,197 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap");
+@import "tailwindcss";
+
+:root {
+  --background: #050508;
+  --foreground: #ededed;
+  --cyan: #00f0ff;
+  --teal: #00d4c8;
+  --teal-dim: rgba(0, 212, 200, 0.5);
+  --teal-glow: 0 0 20px rgba(0, 212, 200, 0.25), 0 0 40px rgba(0, 212, 200, 0.12);
+  --teal-glow-strong: 0 0 10px rgba(0, 212, 200, 0.6), 0 0 30px rgba(0, 212, 200, 0.3),
+    0 0 60px rgba(0, 212, 200, 0.15);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-neon: #00d4c8;
+  --color-neon-bright: #00f0ff;
+  --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", "Consolas", monospace;
+  --font-display: "Orbitron", "Segoe UI", sans-serif;
+}
+
+html {
+  background: var(--background);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  overflow-x: hidden;
+  cursor: none;
+}
+
+a, button, [role="button"] {
+  cursor: none;
+}
+
+/* ── Float idle animation ── */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* ── Rotating mesh grid ── */
+@keyframes mesh-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.mesh-rotate {
+  position: absolute;
+  inset: -60%;
+  background-image:
+    linear-gradient(rgba(0, 212, 200, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 200, 0.07) 1px, transparent 1px);
+  background-size: 45px 45px;
+  animation: mesh-spin 100s linear infinite;
+  pointer-events: none;
+}
+
+/* ── HUD blink circle ── */
+@keyframes hud-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.15; }
+}
+.hud-blink {
+  animation: hud-blink 1.2s ease-in-out infinite;
+}
+
+/* ── Pulse glow for HUD dots ── */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 4px currentColor; opacity: 0.9; }
+  50% { box-shadow: 0 0 12px currentColor, 0 0 20px currentColor; opacity: 1; }
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ── Background grid ── */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(0, 212, 200, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 200, 0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ── Folder card ── */
+.folder-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 12px;
+  background: rgba(0, 212, 200, 0.08);
+  border: 1px solid rgba(0, 212, 200, 0.25);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  color: var(--teal);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.folder-body {
+  padding: 14px 20px;
+  background: rgba(0, 212, 200, 0.04);
+  border: 1px solid rgba(0, 212, 200, 0.18);
+  border-radius: 0 8px 8px 8px;
+  min-width: 160px;
+}
+
+/* ── Connector line from folder to figure ── */
+.connector {
+  position: absolute;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, var(--teal), rgba(0, 212, 200, 0.2));
+}
+.connector-left {
+  right: -70px;
+  width: 60px;
+}
+.connector-right {
+  left: -70px;
+  width: 60px;
+  background: linear-gradient(90deg, rgba(0, 212, 200, 0.2), var(--teal));
+}
+.connector-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--teal);
+  top: 50%;
+  transform: translateY(-50%);
+  box-shadow: 0 0 8px rgba(0, 212, 200, 0.5);
+}
+.connector-dot-end-left { right: -73px; }
+.connector-dot-end-right { left: -73px; }
+
+/* ── Pedestal ── */
+.pedestal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.pedestal-surface {
+  width: 260px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--teal), transparent);
+  box-shadow: 0 0 12px rgba(0, 212, 200, 0.4), 0 2px 20px rgba(0, 212, 200, 0.2);
+}
+
+/* ── Holographic scanline overlay ── */
+.holo-scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 212, 200, 0.03) 2px,
+    rgba(0, 212, 200, 0.03) 4px
+  );
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ── Holographic card ── */
+.holo-card {
+  background: linear-gradient(135deg, rgba(0, 20, 40, 0.8), rgba(0, 40, 60, 0.4));
+  border: 1px solid rgba(0, 212, 200, 0.15);
+  box-shadow: 0 0 15px rgba(0, 212, 200, 0.08), inset 0 0 30px rgba(0, 212, 200, 0.03);
+  backdrop-filter: blur(12px);
+  transition: box-shadow 0.4s ease, border-color 0.4s ease;
+}
+.holo-card:hover {
+  border-color: rgba(0, 212, 200, 0.4);
+  box-shadow: 0 0 25px rgba(0, 212, 200, 0.2), 0 0 50px rgba(0, 212, 200, 0.08),
+    inset 0 0 40px rgba(0, 212, 200, 0.05);
+}
+
+/* ── Hide scrollbar ── */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── Text glow ── */
+.text-glow {
+  text-shadow: 0 0 20px rgba(0, 212, 200, 0.3), 0 0 40px rgba(0, 212, 200, 0.1);
+}
