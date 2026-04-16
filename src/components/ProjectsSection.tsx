@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -88,7 +89,7 @@ function HoloCard({
               </span>
             ))}
           </div>
-          <a href={project.link} target="_blank" rel="noopener noreferrer"
+          <Link href={`/projects/${project.id}`}
             className="inline-flex items-center gap-2 text-xs text-neon hover:text-white transition-colors group whitespace-nowrap flex-shrink-0"
             style={{ fontFamily: "IBM Plex Mono, monospace" }}>
             <span className="inline-block w-4 h-[1px] bg-neon group-hover:w-8 transition-all" />
@@ -96,7 +97,7 @@ function HoloCard({
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-neon">
               <path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" strokeWidth="1.5" />
             </svg>
-          </a>
+          </Link>
         </div>
 
         <div className="absolute top-0 left-0 w-5 h-5 border-l border-t border-neon/25" />
@@ -115,6 +116,14 @@ export default function ProjectsSection() {
   const dragStart = useRef(0);
   const dragging = useRef(false);
   const total = projects.length;
+
+  const applyHashTarget = useCallback((hash: string) => {
+    const match = hash.match(/^#projects-(.+)$/);
+    if (!match) return;
+    const targetId = decodeURIComponent(match[1]);
+    const idx = projects.findIndex((p) => p.id === targetId);
+    if (idx >= 0) setCurrent(idx);
+  }, []);
 
   const getPosition = useCallback(
     (index: number): "left" | "center" | "right" | "hidden" => {
@@ -148,27 +157,34 @@ export default function ProjectsSection() {
     const ctx = gsap.context(() => {
       gsap.from(stage.current, {
         opacity: 0,
-        scale: 0.9,
-        y: 30,
+        scale: 0.95,
+        y: 20,
         duration: 1,
         ease: "power2.out",
         scrollTrigger: {
           trigger: section.current,
           start: "top 100%",
-          end: "top 60%",
-          scrub: 1,
+          end: "top 90%",
+          scrub: 0.3,
         },
       });
     }, section);
     return () => ctx.revert();
   }, []);
 
+  useEffect(() => {
+    applyHashTarget(window.location.hash);
+    const onHash = () => applyHashTarget(window.location.hash);
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, [applyHashTarget]);
+
   return (
     <section
       ref={section}
       id="projects"
-      className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden"
-      style={{ background: "var(--background)", paddingTop: "0px", paddingBottom: "50px" }}
+      className="relative w-full flex flex-col items-center overflow-hidden"
+      style={{ background: "var(--background)", paddingTop: "12px", paddingBottom: "80px" }}
     >
       <div className="absolute inset-0 bg-grid opacity-10" />
       <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 50% 40%, rgba(0,212,200,0.03) 0%, transparent 60%)" }} />

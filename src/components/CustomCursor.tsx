@@ -50,7 +50,7 @@ export default function CustomCursor() {
       {/* Inner dot */}
       <div
         ref={dot}
-        className="fixed top-0 left-0 z-[9999] pointer-events-none -translate-x-1/2 -translate-y-1/2"
+        className="fixed top-0 left-0 z-[10003] pointer-events-none -translate-x-1/2 -translate-y-1/2"
         style={{
           width: 5,
           height: 5,
@@ -62,7 +62,7 @@ export default function CustomCursor() {
       {/* Outer ring */}
       <div
         ref={ring}
-        className="fixed top-0 left-0 z-[9999] pointer-events-none -translate-x-1/2 -translate-y-1/2"
+        className="fixed top-0 left-0 z-[10003] pointer-events-none -translate-x-1/2 -translate-y-1/2"
         style={{
           width: 32,
           height: 32,

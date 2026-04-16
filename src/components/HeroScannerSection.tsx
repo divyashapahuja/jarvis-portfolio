@@ -69,8 +69,9 @@ export default function HeroScannerSection() {
         scrollTrigger: {
           trigger: section.current,
           start: "top top",
-          end: "+=220%",
+          end: "+=200%",
           pin: true,
+          pinType: "fixed",
           scrub: 0.5,
           anticipatePin: 1,
         },
@@ -143,8 +144,8 @@ export default function HeroScannerSection() {
         });
       }
 
-      // Fade everything out seamlessly
-      tl.to(scannerWrap.current, { opacity: 0, duration: 0.03 }, 0.97);
+      // Fade scanner out through the end of the pin so scrub reaches 1.0 with no dead scroll after
+      tl.to(scannerWrap.current, { opacity: 0, duration: 0.08, ease: "none" }, 0.92);
     }, section);
 
     return () => ctx.revert();

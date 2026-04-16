@@ -136,8 +136,7 @@ export default function ContactSection() {
           {/* Core */}
           <circle className="core-pulse" cx={CX} cy={CY} r={35} fill="rgba(0,212,200,0.1)" />
           <circle cx={CX} cy={CY} r={18} fill="rgba(0,212,200,0.15)" />
-          <circle cx={CX} cy={CY} r={5} fill="var(--teal)" style={{ filter: "drop-shadow(0 0 10px rgba(0,212,200,0.8))" }} />
-          <text x={CX} y={CY + 2} textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="11" fontFamily="IBM Plex Mono, monospace" letterSpacing="3" opacity="0.6">CONNECT</text>
+          <text x={CX} y={CY + 2} textAnchor="middle" dominantBaseline="middle" fill="var(--teal)" fontSize="13" fontWeight="600" fontFamily="IBM Plex Mono, monospace" letterSpacing="4" opacity="1" style={{ filter: "drop-shadow(0 0 8px rgba(0,212,200,0.6))" }}>CONNECT</text>
 
           {/* Rings */}
           <circle className="hud-ring" cx={CX} cy={CY} r={45} stroke="var(--teal)" strokeWidth={1.2} strokeOpacity={0.5} />
