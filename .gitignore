@@ -40,5 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# local planning docs
+# Local scratch plans at repo root only (committed blueprints: docs/plans/*.plan.md)
 /plans/
