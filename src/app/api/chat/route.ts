@@ -2,6 +2,9 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest } from "next/server";
 import { projects, experiences, contactLinks } from "@/lib/projects";
 
+/** Node runtime: Gemini SDK expects a full Node environment on Vercel. */
+export const runtime = "nodejs";
+
 const SYSTEM_PROMPT = `You are Jane Doe's portfolio assistant. Answer questions about her skills, projects, experience, and background. Be concise, friendly, and helpful. Keep answers under 3 sentences unless asked for details.
 
 Here is her portfolio information:
@@ -24,7 +27,7 @@ If asked something not related to Jane's profile, politely redirect the conversa
 
 export async function POST(request: NextRequest) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY?.trim();
     if (!apiKey) {
       return Response.json(
         { error: "Gemini API key not configured. Add GEMINI_API_KEY to .env.local" },
@@ -58,9 +61,12 @@ export async function POST(request: NextRequest) {
     return Response.json({ message: text });
   } catch (err) {
     console.error("Chat API error:", err);
-    return Response.json(
-      { error: "Failed to generate response" },
-      { status: 500 }
-    );
+    const detail =
+      err instanceof Error
+        ? err.message
+        : typeof err === "object" && err !== null && "message" in err
+          ? String((err as { message: unknown }).message)
+          : "Failed to generate response";
+    return Response.json({ error: detail }, { status: 500 });
   }
 }
