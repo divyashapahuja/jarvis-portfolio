@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const LINKS = [
   {
@@ -62,6 +62,17 @@ const LINKS = [
 type NavLink = (typeof LINKS)[number];
 
 export default function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [menuOpen]);
+
   const handleClick = useCallback((link: NavLink) => {
     if (link.scrollToScanComplete) {
       const target = 0.80 * 2.0 * window.innerHeight;
@@ -70,51 +81,115 @@ export default function Navbar() {
       const el = document.querySelector(link.href);
       if (el) el.scrollIntoView({ behavior: "smooth" });
     }
+    setMenuOpen(false);
   }, []);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-5 pointer-events-none">
-      <div className="pointer-events-auto flex flex-col gap-1.5">
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
-          className="font-[Orbitron] text-xs tracking-[0.25em] text-neon/70 hover:text-neon transition-colors"
-        >
-          J.DOE
-        </a>
-        <div className="flex items-center gap-2" aria-live="polite" aria-label="System online">
-          <span
-            className="hud-blink h-1.5 w-1.5 shrink-0 rounded-full"
-            style={{ background: "var(--teal)", boxShadow: "0 0 8px rgba(0,212,200,0.65)" }}
-          />
-          <span
-            className="text-[8px] tracking-[0.32em] text-neon/50 sm:text-[9px]"
-            style={{ fontFamily: "IBM Plex Mono, monospace" }}
-          >
-            SYSTEM ONLINE
-          </span>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-8 pointer-events-auto">
-        {LINKS.map((link) => (
+    <>
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-4 sm:px-8 sm:py-5 pointer-events-none">
+        <div className="pointer-events-auto flex flex-col gap-1.5 min-w-0">
           <a
-            key={link.label}
-            href={link.href}
+            href="#"
             onClick={(e) => {
               e.preventDefault();
-              handleClick(link);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+              setMenuOpen(false);
             }}
-            className="group inline-flex items-center gap-1.5 font-[IBM_Plex_Mono] text-[11px] tracking-[0.2em] uppercase text-white/40 hover:text-neon transition-colors"
+            className="font-[Orbitron] text-xs tracking-[0.25em] text-neon/70 hover:text-neon transition-colors"
           >
-            <span className="text-neon/50 group-hover:text-neon transition-colors shrink-0">{link.icon}</span>
-            {link.label}
+            J.DOE
           </a>
-        ))}
-      </div>
-    </nav>
+          <div className="flex items-center gap-2" aria-live="polite" aria-label="System online">
+            <span
+              className="hud-blink h-1.5 w-1.5 shrink-0 rounded-full"
+              style={{ background: "var(--teal)", boxShadow: "0 0 8px rgba(0,212,200,0.65)" }}
+            />
+            <span
+              className="text-[8px] tracking-[0.32em] text-neon/50 sm:text-[9px] truncate"
+              style={{ fontFamily: "IBM Plex Mono, monospace" }}
+            >
+              SYSTEM ONLINE
+            </span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setMenuOpen(true)}
+          className="lg:hidden pointer-events-auto rounded-md border border-neon/25 p-2.5 text-neon hover:bg-neon/10 transition-colors"
+          aria-expanded={menuOpen}
+          aria-label="Open navigation menu"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+            <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
+          </svg>
+        </button>
+
+        <div className="hidden lg:flex items-center gap-6 xl:gap-8 pointer-events-auto">
+          {LINKS.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              onClick={(e) => {
+                e.preventDefault();
+                handleClick(link);
+              }}
+              className="group inline-flex items-center gap-1.5 font-[IBM_Plex_Mono] text-[11px] tracking-[0.2em] uppercase text-white/40 hover:text-neon transition-colors"
+            >
+              <span className="text-neon/50 group-hover:text-neon transition-colors shrink-0">{link.icon}</span>
+              {link.label}
+            </a>
+          ))}
+        </div>
+      </nav>
+
+      {menuOpen ? (
+        <div className="fixed inset-0 z-[60] lg:hidden" role="dialog" aria-modal="true" aria-label="Site navigation">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/70"
+            aria-label="Close menu"
+            onClick={() => setMenuOpen(false)}
+          />
+          <div
+            className="absolute top-0 right-0 flex h-full w-[min(100%,320px)] flex-col border-l border-neon/20 bg-[rgba(5,5,8,0.98)] shadow-[0_0_40px_rgba(0,212,200,0.08)]"
+            style={{ paddingTop: "max(1.25rem, env(safe-area-inset-top))" }}
+          >
+            <div className="flex items-center justify-between border-b border-neon/10 px-4 py-3">
+              <span className="text-[10px] tracking-[0.3em] text-neon/50" style={{ fontFamily: "IBM Plex Mono, monospace" }}>
+                NAV
+              </span>
+              <button
+                type="button"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-md p-2 text-neon/70 hover:text-neon hover:bg-neon/10"
+                aria-label="Close menu"
+              >
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M5 5l10 10M15 5L5 15" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+            <nav className="flex flex-col gap-1 p-4">
+              {LINKS.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleClick(link);
+                  }}
+                  className="flex items-center gap-3 rounded-md px-3 py-3 text-sm tracking-[0.15em] uppercase text-white/70 hover:bg-neon/10 hover:text-neon transition-colors"
+                  style={{ fontFamily: "IBM Plex Mono, monospace" }}
+                >
+                  <span className="text-neon/60">{link.icon}</span>
+                  {link.label}
+                </a>
+              ))}
+            </nav>
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 }

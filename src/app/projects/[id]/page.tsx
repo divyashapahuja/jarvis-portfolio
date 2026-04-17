@@ -32,34 +32,34 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
 
       {/* Top nav */}
       <header className="sticky top-0 z-40 border-b border-neon/10" style={{ background: "rgba(5,5,8,0.85)", backdropFilter: "blur(12px)" }}>
-        <div className="mx-auto max-w-5xl flex items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <Link
-            href={{ pathname: "/", hash: `projects-${project.id}` }}
-            className="inline-flex items-center gap-2 text-[11px] tracking-[0.15em] uppercase text-neon/60 hover:text-neon transition-colors"
+            href={`/#projects-${project.id}`}
+            className="inline-flex items-center gap-2 text-[10px] tracking-[0.12em] text-neon/60 transition-colors hover:text-neon sm:text-[11px] sm:tracking-[0.15em]"
             style={{ fontFamily: "IBM Plex Mono, monospace" }}
           >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-current">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="shrink-0 text-current">
               <path d="M9 3L5 7L9 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             Back to Projects
           </Link>
 
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <h1
-              className="text-sm font-bold tracking-[0.15em] uppercase text-white text-glow"
+              className="min-w-0 truncate text-xs font-bold uppercase tracking-[0.12em] text-glow text-white sm:text-sm sm:tracking-[0.15em]"
               style={{ fontFamily: "Orbitron, sans-serif" }}
             >
               {project.name}
             </h1>
             <div
-              className="w-2.5 h-2.5 rounded-full animate-pulse-glow flex-shrink-0"
+              className="h-2.5 w-2.5 shrink-0 animate-pulse-glow rounded-full"
               style={{ background: project.color, color: project.color }}
             />
           </div>
         </div>
       </header>
 
-      <main className="relative mx-auto max-w-5xl px-6 pt-12 pb-24">
+      <main className="relative mx-auto max-w-5xl px-4 pb-24 pt-8 sm:px-6 sm:pt-12">
         {/* Tools */}
         <div className="flex flex-wrap gap-2 mb-16">
           {project.tools.map((tool) => (
@@ -73,12 +73,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
           ))}
         </div>
 
-        <div className="relative flex gap-16">
-          {/* Left progress tracker */}
+        <div className="relative flex flex-col gap-2 lg:flex-row lg:gap-16">
           <PhaseTracker phases={PHASES.map((p) => p.key)} />
 
-          {/* Content sections */}
-          <div className="flex-1 min-w-0 space-y-0">
+          <div className="min-w-0 flex-1 space-y-0">
             {PHASES.map((phase, i) => {
               const content = project[phase.key] ?? "";
               const showBrackets = i % 2 === 0;
@@ -129,9 +127,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
         </div>
 
         {/* Bottom nav */}
-        <div className="mt-24 pt-8 border-t border-neon/10 flex justify-between items-center">
+        <div className="mt-24 flex flex-col gap-4 border-t border-neon/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
           <Link
-            href={{ pathname: "/", hash: `projects-${projects[0]?.id ?? "alpha"}` }}
+            href={`/#projects-${projects[0]?.id ?? "alpha"}`}
             className="inline-flex items-center gap-2 text-xs text-neon/60 hover:text-neon transition-colors"
             style={{ fontFamily: "IBM Plex Mono, monospace" }}
           >

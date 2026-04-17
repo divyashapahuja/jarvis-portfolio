@@ -105,9 +105,12 @@ export default function ExperienceSection() {
       </div>
 
       {/* Timeline */}
-      <div className="relative max-w-4xl mx-auto px-6">
-        {/* Center vertical line */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-0" style={{ height: lineHeight }}>
+      <div className="relative mx-auto max-w-4xl px-4 sm:px-6">
+        {/* Vertical line — left rail on mobile, centered on lg */}
+        <div
+          className="absolute left-[15px] top-0 lg:left-1/2 lg:-translate-x-1/2"
+          style={{ height: lineHeight }}
+        >
           <svg width="2" height={lineHeight} className="overflow-visible">
             <line
               ref={lineRef}
@@ -130,9 +133,9 @@ export default function ExperienceSection() {
                 className="relative flex items-start"
                 style={{ marginBottom: "60px" }}
               >
-                {/* Year marker on the center line */}
+                {/* Year marker */}
                 <div
-                  className="year-marker absolute left-1/2 -translate-x-1/2 flex flex-col items-center z-10"
+                  className="year-marker absolute left-[15px] z-10 flex -translate-x-1/2 flex-col items-center lg:left-1/2"
                   style={{ top: "8px" }}
                 >
                   <div
@@ -150,9 +153,9 @@ export default function ExperienceSection() {
                   </span>
                 </div>
 
-                {/* Card — alternating left/right */}
+                {/* Card — full width on mobile, alternating on lg */}
                 <div
-                  className={`exp-card w-[calc(50%-30px)] ${isLeft ? "mr-auto pr-4" : "ml-auto pl-4"}`}
+                  className={`exp-card w-full pl-10 lg:w-[calc(50%-30px)] lg:pl-4 ${isLeft ? "lg:mr-auto" : "lg:ml-auto"}`}
                 >
                   <div
                     className="relative p-5"

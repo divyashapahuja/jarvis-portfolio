@@ -4,7 +4,7 @@
 
 Ship a single-page portfolio with a pinned **scanner hero**, **holographic project carousel**, **case-study detail pages**, **timeline experience**, **GPA dial education UI**, **radial contact hub**, **global custom cursor**, and **hash-aware navigation** so returning from `/projects/[id]` recenters the correct project card.
 
-**Viewport:** **Desktop-first.** The shipped layout targets wide screens; some Tailwind breakpoints (`sm` / `md` / `lg`) and `max-w-[95vw]`-style constraints exist, but small screens are not fully adapted (inline navbar, fixed-width carousel cards, absolutely positioned hero HUD cards, two-column timeline). Treat **full mobile responsiveness** as follow-up work if you need parity on phones—see **Viewports / mobile** at the end.
+**Viewport:** **Adaptive** (breakpoint **`lg` / 1024px**). Full desktop HUD from `lg` up; below: slide-out nav, stacked scanner bios, one carousel card, left-rail timeline, horizontal case-study phase chips. See **Viewports / mobile**.
 
 ## Phase 0 — Project bootstrap
 
@@ -19,7 +19,7 @@ In [`src/app/globals.css`](src/app/globals.css), define:
 - CSS variables: `--background`, `--teal`, glow tokens (`--teal-glow`, `--teal-glow-strong`).
 - Utilities: `.bg-grid`, `.text-glow`, `.holo-card`, `.holo-scanlines`, `.hud-blink`, `.animate-pulse-glow`.
 - Connector primitives used by hero bio cards and contact section (folder tab/body, connector gradients).
-- Hide native cursor on desktop experience: `body { cursor: none; }` plus interactive elements also `cursor: none` to match custom cursor.
+- Hide native cursor **from `lg` up** only: below `1024px` use normal `cursor: auto` / `pointer` for touch; at `lg+` match custom cursor (`globals.css`).
 
 ## Phase 2 — App shell: scroll + global overlays
 
@@ -156,9 +156,17 @@ The floating chat panel calls a **server route** that uses Google’s Gemini API
 - Manual checks: `/` section navigation, carousel interactions, `/projects/[id]` navigation, back links, hash reload, cursor visibility on both routes.
 - Update [`README.md`](README.md) with stack, structure, navigation behavior notes.
 
-## Viewports / mobile (honest current state)
+## Viewports / mobile
 
-**Not fully mobile-responsive as shipped.** Sections use fixed pixel widths, large horizontal transforms (carousel), and absolute offsets tuned for desktop. A proper mobile pass would typically include: hamburger or bottom nav, single-column timeline, scaled or stacked project cards, reflowed hero scanner / bio cards, and touch-friendly hit targets (and revisiting `cursor: none` on `body` for touch devices).
+- **`useLgUp` hook** (`src/hooks/useLgUp.ts`): `useSyncExternalStore` + `matchMedia('(min-width: 1024px)')` for SSR-safe breakpoint detection (defaults mobile-first on server).
+- **Globals** (`src/app/globals.css`): `cursor: auto` / `pointer` below `1024px`; custom cursor styling from `lg` up.
+- **CustomCursor:** unmounted below `lg` (see `CustomCursor.tsx`).
+- **Navbar:** hamburger + slide-over panel on small screens; full link row from `lg`.
+- **Hero / scanner:** scaled images, stacked bio “folder” cards under the scanner on small screens; orbit layout + connector lines from `lg` (connectors `hidden lg:block` in `BioCard`).
+- **Projects:** single visible card + swipe/arrows below `lg`; 3D stage from `lg`. Card width `min(calc(100vw - 2rem), 540px)`.
+- **Experience:** vertical line and year dot on a **left rail** on small screens; alternating columns from `lg`.
+- **Case study:** `PhaseTracker` horizontal sticky chip nav below `lg`; vertical dot rail from `lg`. Header stacks on narrow widths.
+- **Chat FAB / panel:** `env(safe-area-inset-*)` for notched devices.
 
 ## Execution order (fastest path to “looks like final”)
 
@@ -170,4 +178,4 @@ The floating chat panel calls a **server route** that uses Google’s Gemini API
 6. hash focus restoration
 7. experience + education + contact
 8. navbar polish + README + final QA
-9. (Optional) Mobile / narrow viewport pass — see **Viewports / mobile**
+9. Narrow viewport behavior is implemented — extend **Viewports / mobile** if you add new sections

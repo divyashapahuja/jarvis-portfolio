@@ -10,8 +10,8 @@ interface Message {
 
 const FAB_STYLE: CSSProperties = {
   position: "fixed",
-  bottom: "1.5rem",
-  right: "1.5rem",
+  bottom: "max(1.5rem, env(safe-area-inset-bottom, 0px))",
+  right: "max(1.5rem, env(safe-area-inset-right, 0px))",
   zIndex: 999999,
   width: "3.5rem",
   height: "3.5rem",
@@ -20,8 +20,8 @@ const FAB_STYLE: CSSProperties = {
 
 const PANEL_STYLE: CSSProperties = {
   position: "fixed",
-  bottom: "6.5rem",
-  right: "1.5rem",
+  bottom: "max(6.5rem, calc(env(safe-area-inset-bottom, 0px) + 5rem))",
+  right: "max(1.5rem, env(safe-area-inset-right, 0px))",
   zIndex: 999998,
   width: "min(360px, calc(100vw - 2rem))",
   maxHeight: "min(480px, calc(100vh - 7rem))",

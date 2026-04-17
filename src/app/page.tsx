@@ -13,11 +13,13 @@ export default function Home() {
     const hash = window.location.hash;
     if (!hash) return;
 
-    // Delay one frame so pinned/animated sections finish initial layout.
+    // Double rAF so pinned hero + projects carousel can read hash and lay out first.
     requestAnimationFrame(() => {
-      const targetHash = hash.startsWith("#projects-") ? "#projects" : hash;
-      const el = document.querySelector(targetHash);
-      if (el) el.scrollIntoView({ behavior: "auto", block: "start" });
+      requestAnimationFrame(() => {
+        const targetHash = hash.startsWith("#projects-") ? "#projects" : hash;
+        const el = document.querySelector(targetHash);
+        if (el) el.scrollIntoView({ behavior: "auto", block: "start" });
+      });
     });
   }, []);
 

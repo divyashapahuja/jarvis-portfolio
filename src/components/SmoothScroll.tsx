@@ -17,13 +17,22 @@ export default function SmoothScroll({
   const rafCb = useRef<((time: number) => void) | null>(null);
 
   useEffect(() => {
-    const lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
+    const lenis = new Lenis({
+      lerp: 0.09,
+      smoothWheel: true,
+      // Let wheel events reach nested overflow:auto regions (hero scanner, modals, etc.)
+      allowNestedScroll: true,
+    });
 
     lenis.on("scroll", ScrollTrigger.update);
 
     rafCb.current = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(rafCb.current);
     gsap.ticker.lagSmoothing(0);
+
+    requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+    });
 
     return () => {
       if (rafCb.current) gsap.ticker.remove(rafCb.current);

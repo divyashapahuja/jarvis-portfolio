@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useCallback, type CSSProperties } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -9,48 +10,62 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 import { projects, type Project } from "@/lib/projects";
+import { useLgUp } from "@/hooks/useLgUp";
+
+const SPREAD_X = 560;
+
+function holoStyleFor(
+  position: "left" | "center" | "right" | "hidden",
+  spread: number,
+): CSSProperties {
+  switch (position) {
+    case "left":
+      return {
+        transform: `translate(-50%, -50%) translateX(-${spread}px) rotateY(28deg) scale(0.85)`,
+        opacity: 0.6,
+        zIndex: 1,
+      };
+    case "center":
+      return {
+        transform: "translate(-50%, -50%) rotateY(0deg) scale(1)",
+        opacity: 1,
+        zIndex: 3,
+      };
+    case "right":
+      return {
+        transform: `translate(-50%, -50%) translateX(${spread}px) rotateY(-28deg) scale(0.85)`,
+        opacity: 0.6,
+        zIndex: 1,
+      };
+    default:
+      return {
+        transform: "translate(-50%, -50%) scale(0.5)",
+        opacity: 0,
+        zIndex: 0,
+        pointerEvents: "none",
+      };
+  }
+}
 
 function HoloCard({
   project,
   index,
   position,
+  spread,
 }: {
   project: Project;
   index: number;
   position: "left" | "center" | "right" | "hidden";
+  spread: number;
 }) {
-  const styles: Record<string, React.CSSProperties> = {
-    left: {
-      transform: "translate(-50%, -50%) translateX(-560px) rotateY(28deg) scale(0.85)",
-      opacity: 0.6,
-      zIndex: 1,
-    },
-    center: {
-      transform: "translate(-50%, -50%) rotateY(0deg) scale(1)",
-      opacity: 1,
-      zIndex: 3,
-    },
-    right: {
-      transform: "translate(-50%, -50%) translateX(560px) rotateY(-28deg) scale(0.85)",
-      opacity: 0.6,
-      zIndex: 1,
-    },
-    hidden: {
-      transform: "translate(-50%, -50%) scale(0.5)",
-      opacity: 0,
-      zIndex: 0,
-      pointerEvents: "none" as const,
-    },
-  };
-
+  const styles = holoStyleFor(position, spread);
   const isSide = position === "left" || position === "right";
 
   return (
     <div
-      className="absolute top-1/2 left-1/2 transition-all duration-500 ease-out"
+      className="absolute top-1/2 left-1/2 w-[min(calc(100vw-2rem),540px)] max-w-[540px] transition-all duration-500 ease-out lg:w-[540px]"
       style={{
-        ...styles[position],
-        width: "540px",
+        ...styles,
         transformStyle: "preserve-3d",
         maskImage: isSide
           ? position === "left"
@@ -64,7 +79,7 @@ function HoloCard({
           : undefined,
       }}
     >
-      <div className="holo-card holo-scanlines rounded-lg p-6 lg:p-8 h-[300px] flex flex-col justify-between relative overflow-hidden">
+      <div className="holo-card holo-scanlines relative flex min-h-[280px] flex-col justify-between overflow-hidden rounded-lg p-5 sm:p-6 sm:min-h-[300px] lg:h-[300px] lg:p-8">
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-neon/50 to-transparent" />
 
         <div className="flex items-start justify-between">
@@ -109,10 +124,17 @@ function HoloCard({
   );
 }
 
+function clampSpreadForViewport(width: number) {
+  return Math.max(220, Math.min(SPREAD_X, Math.floor(width * 0.34)));
+}
+
 export default function ProjectsSection() {
+  const lgUp = useLgUp();
+  const pathname = usePathname();
   const section = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const [current, setCurrent] = useState(0);
+  const [spreadPx, setSpreadPx] = useState(SPREAD_X);
   const dragStart = useRef(0);
   const dragging = useRef(false);
   const total = projects.length;
@@ -127,13 +149,16 @@ export default function ProjectsSection() {
 
   const getPosition = useCallback(
     (index: number): "left" | "center" | "right" | "hidden" => {
+      if (!lgUp) {
+        return index === current ? "center" : "hidden";
+      }
       const diff = ((index - current) % total + total) % total;
       if (diff === 0) return "center";
       if (diff === 1 || (diff === total - 1 && total <= 2)) return "right";
       if (diff === total - 1) return "left";
       return "hidden";
     },
-    [current, total]
+    [current, total, lgUp],
   );
 
   const navigate = useCallback((dir: 1 | -1) => {
@@ -179,6 +204,19 @@ export default function ProjectsSection() {
     return () => window.removeEventListener("hashchange", onHash);
   }, [applyHashTarget]);
 
+  useLayoutEffect(() => {
+    if (pathname !== "/") return;
+    applyHashTarget(window.location.hash);
+  }, [pathname, applyHashTarget]);
+
+  useEffect(() => {
+    if (!lgUp || typeof window === "undefined") return;
+    const sync = () => setSpreadPx(clampSpreadForViewport(window.innerWidth));
+    sync();
+    window.addEventListener("resize", sync);
+    return () => window.removeEventListener("resize", sync);
+  }, [lgUp]);
+
   return (
     <section
       ref={section}
@@ -189,16 +227,22 @@ export default function ProjectsSection() {
       <div className="absolute inset-0 bg-grid opacity-10" />
       <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 50% 40%, rgba(0,212,200,0.03) 0%, transparent 60%)" }} />
 
-      <div className="text-center mb-10">
+      <div className="mb-10 px-4 text-center">
         <p className="text-[10px] tracking-[0.3em] uppercase text-neon/40 mb-3" style={{ fontFamily: "IBM Plex Mono, monospace" }}>— Project Archives —</p>
         <h2 className="text-3xl lg:text-5xl font-bold text-white text-glow mb-3" style={{ fontFamily: "Orbitron, sans-serif" }}>Holographic Display</h2>
         <p className="text-white/30 text-sm">Drag or use arrows to navigate</p>
       </div>
 
-      <div ref={stage} className="relative w-full h-[360px] cursor-grab active:cursor-grabbing select-none" style={{ perspective: "1200px" }}
-        onPointerDown={onPointerDown} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}>
+      <div
+        ref={stage}
+        className="relative h-[400px] w-full cursor-grab select-none active:cursor-grabbing sm:h-[380px] lg:h-[360px] lg:px-0"
+        style={{ perspective: lgUp ? "1200px" : "none" }}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+      >
         {projects.map((project, i) => (
-          <HoloCard key={project.id} project={project} index={i} position={getPosition(i)} />
+          <HoloCard key={project.id} project={project} index={i} position={getPosition(i)} spread={spreadPx} />
         ))}
       </div>
 
@@ -214,8 +258,24 @@ export default function ProjectsSection() {
         ))}
       </div>
 
-      <button onClick={() => navigate(-1)} className="absolute left-8 top-1/2 -translate-y-1/2 text-neon/30 hover:text-neon transition-colors text-3xl" style={{ fontFamily: "monospace" }}>&#x2039;</button>
-      <button onClick={() => navigate(1)} className="absolute right-8 top-1/2 -translate-y-1/2 text-neon/30 hover:text-neon transition-colors text-3xl" style={{ fontFamily: "monospace" }}>&#x203a;</button>
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        className="absolute left-1 top-1/2 z-10 -translate-y-1/2 p-3 text-2xl text-neon/30 transition-colors hover:text-neon sm:left-3 lg:left-8 lg:text-3xl"
+        style={{ fontFamily: "monospace" }}
+        aria-label="Previous project"
+      >
+        &#x2039;
+      </button>
+      <button
+        type="button"
+        onClick={() => navigate(1)}
+        className="absolute right-1 top-1/2 z-10 -translate-y-1/2 p-3 text-2xl text-neon/30 transition-colors hover:text-neon sm:right-3 lg:right-8 lg:text-3xl"
+        style={{ fontFamily: "monospace" }}
+        aria-label="Next project"
+      >
+        &#x203a;
+      </button>
 
       <div className="absolute top-14 left-6 space-y-1 hidden lg:block" style={{ fontFamily: "IBM Plex Mono, monospace", fontSize: "10px", color: "rgba(0,212,200,0.25)" }}>
         <p>PROJ.DB: ACTIVE</p>

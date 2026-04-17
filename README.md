@@ -67,5 +67,5 @@ npm start
 ## Notes
 
 - This project expects modern browsers with JavaScript enabled.
-- **Desktop-first:** the layout and motion are tuned for wide viewports. Narrow screens work only partially; see the blueprint section **Viewports / mobile** for context and a possible follow-up pass.
+- **Responsive layout:** primary breakpoint is Tailwind **`lg` (1024px)**. Below that: slide-out nav, stacked hero / scanner bios, single-card projects carousel, left-rail experience timeline, sticky phase chips on case-study pages, native cursor + larger tap targets. The holographic three-card stage and desktop HUD orbit layout apply from `lg` and up.
 - If your repo remote was moved, update your local remote URL before future pushes.

@@ -2,12 +2,16 @@
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
+import { useLgUp } from "@/hooks/useLgUp";
 
 export default function CustomCursor() {
+  const lgUp = useLgUp();
   const dot = useRef<HTMLDivElement>(null);
   const ring = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!lgUp) return;
+
     const onMove = (e: MouseEvent) => {
       gsap.to(dot.current, {
         x: e.clientX,
@@ -43,7 +47,9 @@ export default function CustomCursor() {
         el.removeEventListener("mouseleave", shrink);
       });
     };
-  }, []);
+  }, [lgUp]);
+
+  if (!lgUp) return null;
 
   return (
     <>
