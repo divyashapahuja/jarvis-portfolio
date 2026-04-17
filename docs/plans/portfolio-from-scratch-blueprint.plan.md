@@ -4,6 +4,8 @@
 
 Ship a single-page portfolio with a pinned **scanner hero**, **holographic project carousel**, **case-study detail pages**, **timeline experience**, **GPA dial education UI**, **radial contact hub**, **global custom cursor**, and **hash-aware navigation** so returning from `/projects/[id]` recenters the correct project card.
 
+**Viewport:** **Desktop-first.** The shipped layout targets wide screens; some Tailwind breakpoints (`sm` / `md` / `lg`) and `max-w-[95vw]`-style constraints exist, but small screens are not fully adapted (inline navbar, fixed-width carousel cards, absolutely positioned hero HUD cards, two-column timeline). Treat **full mobile responsiveness** as follow-up work if you need parity on phones—see **Viewports / mobile** at the end.
+
 ## Phase 0 — Project bootstrap
 
 - Create Next.js App Router + TypeScript + Tailwind.
@@ -138,11 +140,25 @@ Implement [`src/components/Navbar.tsx`](src/components/Navbar.tsx):
 - [`src/components/CustomCursor.tsx`](src/components/CustomCursor.tsx): GSAP follow + hover scale on links/buttons.
 - Verify chatbot UI matches HUD tokens ([`src/components/ChatBot.tsx`](src/components/ChatBot.tsx)).
 
+## Gemini-powered assistant (API + env)
+
+The floating chat panel calls a **server route** that uses Google’s Gemini API; it does not embed the key in the client.
+
+- **Route:** [`src/app/api/chat/route.ts`](src/app/api/chat/route.ts) — `POST` with a `messages` array; reads `process.env.GEMINI_API_KEY` via `@google/generative-ai`.
+- **Client:** [`src/components/ChatBot.tsx`](src/components/ChatBot.tsx) — `fetch("/api/chat", …)`.
+- **Local:** add `.env.local` (gitignored) with `GEMINI_API_KEY=your_key`. Get a key from [Google AI Studio](https://aistudio.google.com/apikey).
+- **Production:** set `GEMINI_API_KEY` in your host’s environment (e.g. Vercel → Project → Settings → Environment Variables). Never commit the key.
+- **Without a key:** the API responds with an error payload; the UI should degrade gracefully for end users.
+
 ## Phase 14 — QA + docs
 
 - Run `npm run build` after each major milestone.
 - Manual checks: `/` section navigation, carousel interactions, `/projects/[id]` navigation, back links, hash reload, cursor visibility on both routes.
-- Update [`README.md`](README.md) with stack, structure, and navigation behavior notes.
+- Update [`README.md`](README.md) with stack, structure, navigation behavior notes.
+
+## Viewports / mobile (honest current state)
+
+**Not fully mobile-responsive as shipped.** Sections use fixed pixel widths, large horizontal transforms (carousel), and absolute offsets tuned for desktop. A proper mobile pass would typically include: hamburger or bottom nav, single-column timeline, scaled or stacked project cards, reflowed hero scanner / bio cards, and touch-friendly hit targets (and revisiting `cursor: none` on `body` for touch devices).
 
 ## Execution order (fastest path to “looks like final”)
 
@@ -154,3 +170,4 @@ Implement [`src/components/Navbar.tsx`](src/components/Navbar.tsx):
 6. hash focus restoration
 7. experience + education + contact
 8. navbar polish + README + final QA
+9. (Optional) Mobile / narrow viewport pass — see **Viewports / mobile**
