@@ -43,11 +43,13 @@ If `GEMINI_API_KEY` is missing, `/api/chat` returns an error and the bot will no
 
 ### Gemini 429 “quota” on the first message (free tier)
 
-That message usually means **Google is not giving your project any quota yet**, not that you sent many requests. Typical fixes:
+You can use the **free tier** with a key from [Google AI Studio](https://aistudio.google.com/apikey) **without** adding a card or linking Cloud billing. A **429** still sometimes appears on early calls; it usually reflects **rate limits, per-model limits, or project/API setup**, not “you used the paid tier wrong.”
 
-1. In [Google AI Studio](https://aistudio.google.com/) / Cloud console, **link a billing account** to the project that owns the API key. The Gemini **free tier can still apply**; without billing linked, some projects show **limit 0** and return **429** immediately.
-2. Confirm the **Generative Language API** (Gemini API) is enabled for that Google Cloud project.
-3. Check [rate limits / usage](https://aistudio.google.com/) for the key’s project.
+Things to try:
+
+1. Confirm the **Generative Language API** (Gemini API) is enabled for the Google Cloud project tied to the key (AI Studio / Cloud Console).
+2. Check [usage and rate limits](https://aistudio.google.com/) for that project.
+3. Create a **new API key** in AI Studio and update Vercel, then **redeploy** (and match **Production vs Preview** env scope to the URL you test).
 4. Try another model via env: set **`GEMINI_MODEL`** to e.g. `gemini-1.5-flash` or `gemini-2.0-flash-001` (defaults to **`gemini-2.0-flash`** if unset).
 
 ## Local Development
