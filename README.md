@@ -39,16 +39,6 @@ The chat assistant needs a Google Gemini API key on the **server** (never expose
 3. Get a key from [Google AI Studio](https://aistudio.google.com/apikey).
 4. For production (e.g. Vercel), add the same variable in the host’s environment settings.
 
-If `GEMINI_API_KEY` is missing, `/api/chat` returns an error and the bot will not be able to reply.
-
-### Gemini 429 and `limit: 0` on the free tier
-
-You can use the **free tier** with a key from [Google AI Studio](https://aistudio.google.com/apikey) **without** adding a card.
-
-If the error text includes **`limit: 0`** for a model (e.g. `gemini-2.0-flash`), Google is **not granting any free-tier quota for that model** on your project right now. That is **not** “you sent too many requests”; it is a **per-model / per-project allocation** issue. Fix: use a **different model id** via **`GEMINI_MODEL`** (see [rate limits](https://ai.google.dev/gemini-api/docs/rate-limits) and [usage](https://ai.dev/rate-limit)).
-
-This app defaults to **`gemini-1.5-flash`** because **`gemini-2.0-flash`** often hits `limit: 0` on free tier for AI Studio keys. Override if you prefer, e.g. **`GEMINI_MODEL=gemini-2.0-flash-001`** or another model your project supports.
-
 Other useful checks:
 
 1. Confirm **Generative Language API** is enabled for the Cloud project tied to the key.
