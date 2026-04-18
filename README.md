@@ -67,7 +67,7 @@ npm start
 - `src/app/api/chat/route.ts` - Gemini proxy for the chat panel
 - `src/lib/projects.ts` - project, experience, education, contact data
 - `src/components/` - visual sections and shared UI components
-- `docs/plans/portfolio-from-scratch-blueprint.plan.md` — blueprint lives in `docs/plans/` (not the gitignored `/plans/` at repo root)
+- `docs/plans/portfolio-from-scratch-blueprint.plan.md` — blueprint lives in `docs/plans/`
 
 ## Notes
 
