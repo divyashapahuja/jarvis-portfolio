@@ -5,16 +5,17 @@ import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useXlUp } from "@/hooks/useLgUp";
+import { portfolioProfile } from "@/lib/projects";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
 const BIO = {
-  name: "Jane Doe",
-  location: "City, Country",
-  skills: ["React", "Next.js", "TypeScript", "Python", "GSAP", "Tailwind"],
-  about: "Building digital experiences that inspire and delight.",
+  name: portfolioProfile.name,
+  location: portfolioProfile.location,
+  skills: [...portfolioProfile.skills],
+  about: portfolioProfile.about,
 };
 
 const CIRCLE_R = 34;

@@ -1,29 +1,49 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest } from "next/server";
-import { projects, experiences, contactLinks } from "@/lib/projects";
+import {
+  experiences,
+  educations,
+  getProfessionalTenureSummary,
+  formatProjectsCaseStudyForChat,
+  formatCurrentDateForChat,
+  formatProfileForChat,
+  formatContactLinksForChat,
+} from "@/lib/projects";
 
 /** Node runtime: Gemini SDK expects a full Node environment on Vercel. */
 export const runtime = "nodejs";
 
-const SYSTEM_PROMPT = `You are Jane Doe's portfolio assistant. Answer questions about her skills, projects, experience, and background. Be concise, friendly, and helpful. Keep answers under 3 sentences unless asked for details.
+function buildSystemPrompt(asOf = new Date()) {
+  return `You are Jane Doe's portfolio assistant. Answer ONLY from the portfolio information below—do not invent employers, dates, degrees, or metrics. If something is not listed, say you do not see it in her portfolio. Be concise, friendly, and helpful. Keep answers under 3 sentences unless asked for details.
 
-Here is her portfolio information:
+— Reference date / “today” (server clock, typically UTC on Vercel):
+${formatCurrentDateForChat(asOf)}
 
-Name: Jane Doe
-Role: Full Stack Developer
-Skills: React, Next.js, TypeScript, Python, GSAP, Tailwind
-About: Building digital experiences that inspire and delight.
+— Profile (about, identity, skills):
+${formatProfileForChat()}
 
-Projects:
-${projects.map((p) => `- ${p.name}: ${p.description} (Tools: ${p.tools.join(", ")})`).join("\n")}
+— Projects (case-study excerpts match the site):
+${formatProjectsCaseStudyForChat()}
 
-Experience:
+— Experience (employers, titles, date ranges):
 ${experiences.map((e) => `- ${e.company} — ${e.role} (${e.period}): ${e.description.join("; ")}`).join("\n")}
 
-Contact:
-${contactLinks.map((c) => `- ${c.label}: ${c.href}`).join("\n")}
+${getProfessionalTenureSummary(asOf)}
+
+— Education (degrees, schools, GPA; highest degree is the B.S. below):
+${educations
+  .map(
+    (ed) =>
+      `- ${ed.school}: ${ed.degree} — ${ed.field} (${ed.period})${ed.gpa != null ? `; GPA ${ed.gpa}` : ""}. Highlights: ${ed.highlights.join("; ")}.`,
+  )
+  .join("\n")}
+Highest degree: B.S. Computer Science from State University (2019–2023). She also holds an A.S. in Mathematics & Sciences from City College (2017–2019).
+
+— Contact links (use these exact labels and URLs):
+${formatContactLinksForChat()}
 
 If asked something not related to Jane's profile, politely redirect the conversation back to the portfolio.`;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,12 +61,15 @@ export async function POST(request: NextRequest) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const modelId = process.env.GEMINI_MODEL?.trim() || "gemini-2.0-flash";
+    // Default avoids models where Google reports free-tier limit: 0 for some AI Studio projects (see README).
+    const modelId = process.env.GEMINI_MODEL?.trim() || "gemini-1.5-flash";
     const model = genAI.getGenerativeModel({ model: modelId });
+
+    const systemPrompt = buildSystemPrompt(new Date());
 
     const chat = model.startChat({
       history: [
-        { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
+        { role: "user", parts: [{ text: systemPrompt }] },
         { role: "model", parts: [{ text: "Understood! I'm Jane's portfolio assistant. How can I help you learn more about her work and experience?" }] },
         ...messages.slice(0, -1).map((m: { role: string; content: string }) => ({
           role: m.role === "user" ? "user" : "model",

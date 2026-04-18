@@ -12,6 +12,22 @@ export interface Project {
   reflection?: string;
 }
 
+/** Canonical profile for hero, chat, and metadata — edit in one place. */
+export const portfolioProfile = {
+  name: "Jane Doe",
+  role: "Full Stack Developer",
+  location: "City, Country",
+  skills: [
+    "React",
+    "Next.js",
+    "TypeScript",
+    "Python",
+    "GSAP",
+    "Tailwind",
+  ] as const,
+  about: "Building digital experiences that inspire and delight.",
+} as const;
+
 export const projects: Project[] = [
   {
     id: "alpha",
@@ -196,6 +212,80 @@ export const educations: Education[] = [
     ],
   },
 ];
+
+const CHAT_SNIPPET_MAX = 450;
+
+function clipForChat(s: string, max: number): string {
+  const t = s.trim();
+  if (t.length <= max) return t;
+  return `${t.slice(0, max).trimEnd()}…`;
+}
+
+/** First month of the earliest role in `experiences` (Web Developer Intern, Jan 2023). Update if career data changes. */
+export const CAREER_START = new Date(2023, 0, 1);
+
+/**
+ * Wall-clock span from first listed role through `asOf` — use in chat so the model does not guess years.
+ */
+export function formatCurrentDateForChat(asOf: Date = new Date()): string {
+  const long = asOf.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  return `Current date (for “today”, “right now”, or “this year”): ${long}. ISO calendar date: ${asOf.toISOString().slice(0, 10)}. (Rendered on the server, usually UTC on Vercel.)`;
+}
+
+export function formatProfileForChat(): string {
+  const p = portfolioProfile;
+  return [
+    `Name: ${p.name}`,
+    `Role: ${p.role}`,
+    `Location: ${p.location}`,
+    `Skills: ${p.skills.join(", ")}`,
+    `About: ${p.about}`,
+  ].join("\n");
+}
+
+export function formatContactLinksForChat(): string {
+  return contactLinks.map((c) => `- ${c.label}: ${c.href}`).join("\n");
+}
+
+export function getProfessionalTenureSummary(asOf: Date = new Date()): string {
+  const start = CAREER_START;
+  let months =
+    (asOf.getFullYear() - start.getFullYear()) * 12 + (asOf.getMonth() - start.getMonth());
+  if (asOf.getDate() < start.getDate()) months -= 1;
+  months = Math.max(0, months);
+  const years = Math.floor(months / 12);
+  const rem = months % 12;
+  const asOfStr = asOf.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+  return `Authoritative answer for “years of experience” / “how long working”: ${years} year(s) and ${rem} month(s) from ${start.toLocaleDateString("en-US", { month: "long", year: "numeric" })} through ${asOfStr} (end-to-end across the roles listed). Use this figure; do not infer a different duration.`;
+}
+
+/** Full case-study text for chat (truncated per section) — same source as project detail pages. */
+export function formatProjectsCaseStudyForChat(maxLen = CHAT_SNIPPET_MAX): string {
+  return projects
+    .map((p) => {
+      const lines: string[] = [
+        `— ${p.name} (id: ${p.id})`,
+        `  Summary: ${p.description}`,
+        `  Tools: ${p.tools.join(", ")}`,
+      ];
+      if (p.background) lines.push(`  Background: ${clipForChat(p.background, maxLen)}`);
+      if (p.research) lines.push(`  Research: ${clipForChat(p.research, maxLen)}`);
+      if (p.implementation) lines.push(`  Implementation: ${clipForChat(p.implementation, maxLen)}`);
+      if (p.result) lines.push(`  Result: ${clipForChat(p.result, maxLen)}`);
+      if (p.reflection) lines.push(`  Reflection: ${clipForChat(p.reflection, maxLen)}`);
+      return lines.join("\n");
+    })
+    .join("\n");
+}
 
 export const contactLinks = [
   { label: "Email", href: "mailto:hello@example.com", angle: -90 },

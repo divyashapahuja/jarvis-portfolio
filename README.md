@@ -32,8 +32,8 @@ The chat assistant needs a Google Gemini API key on the **server** (never expose
 
    ```bash
    GEMINI_API_KEY=your_key_here
-   # Optional: override model if you hit 429 / quota on the default (see note below)
-   # GEMINI_MODEL=gemini-1.5-flash
+   # Optional: override default model (defaults to gemini-1.5-flash)
+   # GEMINI_MODEL=gemini-2.0-flash
    ```
 
 3. Get a key from [Google AI Studio](https://aistudio.google.com/apikey).
@@ -41,16 +41,18 @@ The chat assistant needs a Google Gemini API key on the **server** (never expose
 
 If `GEMINI_API_KEY` is missing, `/api/chat` returns an error and the bot will not be able to reply.
 
-### Gemini 429 “quota” on the first message (free tier)
+### Gemini 429 and `limit: 0` on the free tier
 
-You can use the **free tier** with a key from [Google AI Studio](https://aistudio.google.com/apikey) **without** adding a card or linking Cloud billing. A **429** still sometimes appears on early calls; it usually reflects **rate limits, per-model limits, or project/API setup**, not “you used the paid tier wrong.”
+You can use the **free tier** with a key from [Google AI Studio](https://aistudio.google.com/apikey) **without** adding a card.
 
-Things to try:
+If the error text includes **`limit: 0`** for a model (e.g. `gemini-2.0-flash`), Google is **not granting any free-tier quota for that model** on your project right now. That is **not** “you sent too many requests”; it is a **per-model / per-project allocation** issue. Fix: use a **different model id** via **`GEMINI_MODEL`** (see [rate limits](https://ai.google.dev/gemini-api/docs/rate-limits) and [usage](https://ai.dev/rate-limit)).
 
-1. Confirm the **Generative Language API** (Gemini API) is enabled for the Google Cloud project tied to the key (AI Studio / Cloud Console).
-2. Check [usage and rate limits](https://aistudio.google.com/) for that project.
-3. Create a **new API key** in AI Studio and update Vercel, then **redeploy** (and match **Production vs Preview** env scope to the URL you test).
-4. Try another model via env: set **`GEMINI_MODEL`** to e.g. `gemini-1.5-flash` or `gemini-2.0-flash-001` (defaults to **`gemini-2.0-flash`** if unset).
+This app defaults to **`gemini-1.5-flash`** because **`gemini-2.0-flash`** often hits `limit: 0` on free tier for AI Studio keys. Override if you prefer, e.g. **`GEMINI_MODEL=gemini-2.0-flash-001`** or another model your project supports.
+
+Other useful checks:
+
+1. Confirm **Generative Language API** is enabled for the Cloud project tied to the key.
+2. Create a **new API key**, update Vercel, **redeploy**, and match **Production vs Preview** to the URL you test.
 
 ## Local Development
 
