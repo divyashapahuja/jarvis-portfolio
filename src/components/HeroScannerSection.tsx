@@ -122,7 +122,7 @@ export default function HeroScannerSection() {
         // Each folder gets its own beat (~25% more scroll vs one short stagger block).
         const revealDur = 0.12;
         const step = 0.14;
-        let t = 0.26;
+        let t = 0.46;
         if (nameEl.current) {
           mobileTl.to(nameEl.current, { opacity: 1, x: 0, duration: revealDur, ease: "power2.out" }, t);
           t += step;
