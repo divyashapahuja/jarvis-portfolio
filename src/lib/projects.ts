@@ -14,19 +14,33 @@ export interface Project {
 
 /** Canonical profile for hero, chat, and metadata — edit in one place. */
 export const portfolioProfile = {
-  name: "Jane Doe",
-  role: "Full Stack Developer",
-  location: "City, Country",
+  name: "Divyasha Pahuja",
+  role: "AI / ML Engineer",
+  location: "Toronto, ON",
   skills: [
-    "React",
-    "Next.js",
-    "TypeScript",
     "Python",
-    "GSAP",
-    "Tailwind",
+    "PyTorch",
+    "TensorFlow",
+    "LangChain",
+    "NLP",
+    "Computer Vision",
+    "SQL",
+    "FastAPI",
   ] as const,
-  about: "Building digital experiences that inspire and delight.",
+  about:
+    "Machine learning and AI engineer with a software engineering foundation, 3+ years of industry experience, and an M.S. in Computer Science. I build ML systems spanning NLP and computer vision, Gen AI workflows, LLM orchestration, and model–data integration.",
 } as const;
+
+/** Navbar brand (e.g. D.PAHUJA) — derived from `portfolioProfile.name`. */
+export function portfolioNavMonogram(): string {
+  const parts = portfolioProfile.name.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    const first = parts[0]!.charAt(0).toUpperCase();
+    const last = parts[parts.length - 1]!.toUpperCase();
+    return `${first}.${last}`;
+  }
+  return portfolioProfile.name.toUpperCase().slice(0, 8);
+}
 
 export const projects: Project[] = [
   {
@@ -136,36 +150,54 @@ export interface Experience {
 
 export const experiences: Experience[] = [
   {
-    company: "Tech Corp",
-    role: "Full Stack Developer",
-    period: "Jan 2024 — Present",
+    company: "Techneto Corp. · Mesa, US",
+    role: "AI/ML Researcher",
+    period: "Jul 2025 — Dec 2025",
+    year: 2025,
+    description: [
+      "Led research on diffusion-based architectures as alternatives to transformer LLMs to improve generative efficiency.",
+      "Evaluated and calibrated 3+ masked diffusion transformer models for text, audio, and streaming data.",
+      "Applied statistical losses (KL divergence, cross-entropy) to optimize training and improve model stability.",
+    ],
+  },
+  {
+    company: "University of Illinois Chicago",
+    role: "Research Assistant",
+    period: "Sep 2024 — Jul 2025",
     year: 2024,
     description: [
-      "Led development of a real-time analytics dashboard serving 10K+ users",
-      "Built microservices architecture with Node.js and Python",
-      "Reduced page load time by 40% through performance optimization",
+      "Directed a healthcare informatics study on ADHD detection using multimodal ML (language, neuroimaging, and other modalities).",
+      "Follow-up work characterizing evolving longitudinal language patterns in neuroatypical individuals during a conversational social-skills performance assessment.",
     ],
   },
   {
-    company: "Startup Labs",
-    role: "Frontend Engineer",
-    period: "Jun 2023 — Dec 2023",
-    year: 2023,
+    company: "Newgen Software Technologies Limited · Noida, IN",
+    role: "Software Engineer",
+    period: "Jul 2019 — Jul 2022",
+    year: 2019,
     description: [
-      "Developed responsive web applications using React and Next.js",
-      "Implemented complex animation systems with GSAP and Framer Motion",
-      "Collaborated with design team to create pixel-perfect UI components",
+      "Michael’s Stores: orchestrated optimization of 25+ ETL pipelines (18% faster processing); PySpark for large-scale workloads (28% runtime reduction vs legacy); Advanced Java RF screens for WMS integration.",
+      "P&G: automated data workflows in Python; FastAPI REST services for internal ML/data pipelines (30% less manual processing); Git-based deployments through SDLC (DEV, UAT, production).",
+      "Americold: SQL/MOCA query optimization (28% faster retrieval on 500k+ record datasets); documentation for client adoption.",
     ],
   },
   {
-    company: "Digital Agency",
-    role: "Web Developer Intern",
-    period: "Jan 2023 — May 2023",
-    year: 2023,
+    company: "Newgen Software Technologies Limited · Noida, IN",
+    role: "Software Trainee",
+    period: "Feb 2019 — Jun 2019",
+    year: 2019,
     description: [
-      "Built client-facing websites using modern JavaScript frameworks",
-      "Integrated REST APIs and third-party services",
-      "Contributed to an internal design system used across 12 projects",
+      "AAFES: advanced SQL for warehouse management; ~20% efficiency gains on 100k+ entry datasets; JDA 2020 front-end integration with backend systems.",
+    ],
+  },
+  {
+    company: "Federation of Indian Chambers of Commerce and Industry · New Delhi, IN",
+    role: "Software Intern",
+    period: "Jun 2018 — Jul 2018",
+    year: 2018,
+    description: [
+      "Built HR-facing applications that removed manual workflows and improved operational efficiency by 45%.",
+      "Designed a relational schema in Microsoft SQL Server and shipped a C#/.NET application that reduced processing time by 12%.",
     ],
   },
 ];
@@ -185,31 +217,71 @@ export interface Education {
 
 export const educations: Education[] = [
   {
-    school: "State University",
-    degree: "B.S. Computer Science",
-    field: "Software engineering, algorithms, distributed systems",
-    period: "2019 — 2023",
-    year: 2023,
-    gradLabel: "CLASS OF\n2023",
-    gpa: 3.8,
+    school: "University of Illinois Chicago (UIC)",
+    degree: "M.S. Computer Science",
+    field: "Machine learning, NLP, multimodal modeling, and applied AI research.",
+    period: "May 2024",
+    year: 2024,
+    gradLabel: "M.S.\n2024",
+    gpa: 3.88,
     highlights: [
-      "Dean’s List (4 semesters); GPA 3.8",
-      "Undergraduate research assistant — human–computer interaction lab",
-      "Coursework: operating systems, databases, machine learning, graphics",
+      "Graduate GPA 3.88 / 4.0",
+      "Research assistant — healthcare informatics and longitudinal language modeling",
     ],
   },
   {
-    school: "City College",
-    degree: "A.S. Mathematics & Sciences",
-    field: "STEM foundation transfer program",
-    period: "2017 — 2019",
+    school: "Guru Gobind Singh Indraprastha University (GGSIPU)",
+    degree: "B.Tech Computer Science and Engineering",
+    field: "Software engineering, algorithms, and systems fundamentals — New Delhi, India.",
+    period: "Jun 2019",
     year: 2019,
-    gradLabel: "HONORS\n2019",
-    gpa: 3.65,
-    highlights: [
-      "Honors program; peer tutor for calculus and introductory programming",
-      "Robotics club — regional competition finalist",
-    ],
+    gradLabel: "B.TECH\n2019",
+    highlights: ["GPA 8.25 / 10.0"],
+  },
+];
+
+export interface Publication {
+  id: string;
+  year: number;
+  title: string;
+  venue: string;
+  dateLabel: string;
+  contribution: string;
+  /** Publisher, DOI, or Scholar search — opens in a new tab */
+  href?: string;
+}
+
+export const publications: Publication[] = [
+  {
+    id: "benford-covid",
+    year: 2022,
+    title:
+      "Application of Benford’s Law to Detect if COVID-19 Data is under Reported or Manipulated",
+    venue: "New Frontiers in Communication and Intelligent Systems (Springer)",
+    dateLabel: "Feb 2022",
+    contribution:
+      "Implemented an SEIR-style epidemic model adapted for COVID-19 parameters and Benford’s Law analyses to assess data integrity across countries.",
+    href: "https://scholar.google.com/scholar?q=Application+of+Benford%27s+Law+COVID-19+Divyasha+Pahuja",
+  },
+  {
+    id: "music-emotion",
+    year: 2022,
+    title: "Music Emotion Recognition using Neural Networks",
+    venue: "Proceedings of the Third ICCCES, Springer LNEE",
+    dateLabel: "Feb 2022",
+    contribution:
+      "Hyperparameter-tuned CNN on spectrograms for genre/emotion prediction; compared optimizers and learning rates (10⁻², 10⁻³, 10⁻⁴) and reported findings.",
+    href: "https://scholar.google.com/scholar?q=Music+Emotion+Recognition+Neural+Networks+Divyasha+Pahuja",
+  },
+  {
+    id: "uber-reviews",
+    year: 2019,
+    title: "Categorization and Classification of Uber Reviews",
+    venue: "Advances in Computing and Intelligent Systems, Springer AIS (Web of Science)",
+    dateLabel: "Apr 2019",
+    contribution:
+      "Aspect + sentiment categorization for Uber reviews; benchmarked Naive Bayes, KNN, decision trees, and random forests with reported accuracy.",
+    href: "https://scholar.google.com/scholar?q=Categorization+Classification+Uber+Reviews+Divyasha+Pahuja",
   },
 ];
 
@@ -221,8 +293,8 @@ function clipForChat(s: string, max: number): string {
   return `${t.slice(0, max).trimEnd()}…`;
 }
 
-/** First month of the earliest role in `experiences` (Web Developer Intern, Jan 2023). Update if career data changes. */
-export const CAREER_START = new Date(2023, 0, 1);
+/** First month of the earliest role in `experiences` (Software Intern, Jun 2018). Update if career data changes. */
+export const CAREER_START = new Date(2018, 5, 1);
 
 /**
  * Wall-clock span from first listed role through `asOf` — use in chat so the model does not guess years.
@@ -250,6 +322,36 @@ export function formatProfileForChat(): string {
 
 export function formatContactLinksForChat(): string {
   return contactLinks.map((c) => `- ${c.label}: ${c.href}`).join("\n");
+}
+
+/** Highest degree first, then others — keeps chat aligned with `educations` without hardcoding. */
+export function formatHighestDegreeForChat(): string {
+  const sorted = [...educations].sort((a, b) => b.year - a.year);
+  if (sorted.length === 0) return "No degrees are listed in the portfolio data.";
+  const [top, ...rest] = sorted;
+  const gpa =
+    top.gpa != null && !Number.isNaN(top.gpa) ? `; GPA ${top.gpa.toFixed(2)} / 4.0 where applicable` : "";
+  const head = `Highest listed degree: ${top.degree} from ${top.school} (${top.period})${gpa}.`;
+  if (rest.length === 0) return head;
+  const tail = rest
+    .map((ed) => {
+      const g =
+        ed.gpa != null && !Number.isNaN(ed.gpa) ? ` (GPA ${ed.gpa.toFixed(2)} / 4.0)` : "";
+      return `${ed.degree} from ${ed.school} (${ed.period})${g}`;
+    })
+    .join("; ");
+  return `${head} Also listed: ${tail}.`;
+}
+
+export function formatPublicationsForChat(maxLen = CHAT_SNIPPET_MAX): string {
+  if (publications.length === 0) return "No publications are listed.";
+  return publications
+    .map((pub) => {
+      const link = pub.href ? ` Link: ${pub.href}` : "";
+      const line = `${pub.title} (${pub.dateLabel}) — ${pub.venue}. ${pub.contribution}${link}`;
+      return clipForChat(line, maxLen);
+    })
+    .join("\n");
 }
 
 export function getProfessionalTenureSummary(asOf: Date = new Date()): string {
@@ -288,10 +390,26 @@ export function formatProjectsCaseStudyForChat(maxLen = CHAT_SNIPPET_MAX): strin
 }
 
 export const contactLinks = [
-  { label: "Email", href: "mailto:hello@example.com", angle: -90 },
-  { label: "GitHub", href: "https://github.com", angle: -30 },
-  { label: "LinkedIn", href: "https://linkedin.com", angle: 30 },
-  { label: "Twitter", href: "https://twitter.com", angle: 90 },
-  { label: "Resume", href: "#", angle: 150 },
-  { label: "Blog", href: "#", angle: 210 },
+  {
+    label: "Email",
+    href: "mailto:?subject=Portfolio%20inquiry%20%28Divyasha%20Pahuja%29",
+    angle: -90,
+  },
+  {
+    label: "GitHub",
+    href: "https://github.com/search?q=Divyasha+Pahuja&type=users",
+    angle: -30,
+  },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/divyasha-pahuja", angle: 30 },
+  { label: "Phone", href: "tel:+14374356411", angle: 90 },
+  {
+    label: "Resume",
+    href: "/Divyasha_Pahuja_Resume_Comprehensive.pdf",
+    angle: 150,
+  },
+  {
+    label: "Scholar",
+    href: "https://scholar.google.com/scholar?q=Divyasha+Pahuja",
+    angle: 210,
+  },
 ];

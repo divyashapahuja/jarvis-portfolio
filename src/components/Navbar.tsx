@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { portfolioNavMonogram } from "@/lib/projects";
 
 const LINKS = [
   {
@@ -43,6 +44,18 @@ const LINKS = [
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
         <path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z" />
         <path d="M6 12v5c0 3 3.5 5 8 5s8-2 8-5v-5" />
+      </svg>
+    ),
+  },
+  {
+    label: "Publications",
+    href: "#publications",
+    scrollToScanComplete: false,
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+        <path d="M4 19.5A2.5 2.5 0 016.5 17H20" strokeLinecap="round" />
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
+        <path d="M8 7h8M8 11h8" strokeLinecap="round" />
       </svg>
     ),
   },
@@ -97,7 +110,7 @@ export default function Navbar() {
             }}
             className="font-[Orbitron] text-xs tracking-[0.25em] text-neon/70 hover:text-neon transition-colors"
           >
-            J.DOE
+            {portfolioNavMonogram()}
           </a>
           <div className="flex items-center gap-2" aria-live="polite" aria-label="System online">
             <span
