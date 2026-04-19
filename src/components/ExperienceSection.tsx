@@ -32,6 +32,11 @@ function mobileWeavePathDFallback(n: number, H: number): string {
   return d;
 }
 
+/** Whole px so path + H stabilize; avoids ResizeObserver ↔ setState feedback on mobile. */
+function px(n: number) {
+  return Math.round(n);
+}
+
 /** Build weave from measured `.exp-card` bands inside `entries` (mobile coordinates, y in px). */
 function weavePathFromMeasuredCards(entries: HTMLElement): { H: number; d: string } | null {
   const rows = entries.querySelectorAll<HTMLElement>(".exp-timeline-row");
@@ -44,8 +49,8 @@ function weavePathFromMeasuredCards(entries: HTMLElement): { H: number; d: strin
     const card = row.querySelector<HTMLElement>(".exp-card");
     if (!card) return;
     const cRect = card.getBoundingClientRect();
-    const top = cRect.top - eRect.top + entries.scrollTop;
-    const bottom = cRect.bottom - eRect.top + entries.scrollTop;
+    const top = px(cRect.top - eRect.top + entries.scrollTop);
+    const bottom = px(cRect.bottom - eRect.top + entries.scrollTop);
     bands.push({ top, bottom });
   });
 
@@ -59,7 +64,7 @@ function weavePathFromMeasuredCards(entries: HTMLElement): { H: number; d: strin
   let d = `M ${mid} 0 L ${mid} ${bands[0].top}`;
   for (let i = 0; i < bands.length; i++) {
     const { top, bottom } = bands[i];
-    const yMid = (top + bottom) / 2;
+    const yMid = px((top + bottom) / 2);
     const dx = i % 2 === 0 ? -sway : sway;
     d += ` L ${mid + dx} ${yMid}`;
     d += ` L ${mid} ${bottom}`;
@@ -86,12 +91,18 @@ export default function ExperienceSection() {
 
   const syncWeaveFromLayout = () => {
     if (typeof window === "undefined") return;
-    if (!window.matchMedia("(max-width: 1023px)").matches) return;
-    const el = entriesRef.current;
-    if (!el) return;
-    const measured = weavePathFromMeasuredCards(el);
-    if (!measured) return;
-    setWeaveGeom(measured);
+    try {
+      if (!window.matchMedia("(max-width: 1023px)").matches) return;
+      const el = entriesRef.current;
+      if (!el) return;
+      const measured = weavePathFromMeasuredCards(el);
+      if (!measured) return;
+      setWeaveGeom((prev) =>
+        prev.H === measured.H && prev.d === measured.d ? prev : measured,
+      );
+    } catch {
+      /* layout/measure must never take down the app shell (e.g. odd WebViews) */
+    }
   };
 
   useLayoutEffect(() => {

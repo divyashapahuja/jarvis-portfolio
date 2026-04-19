@@ -17,7 +17,12 @@ export default function SmoothScroll({
   const rafCb = useRef<((time: number) => void) | null>(null);
 
   useEffect(() => {
-    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+    let isTouchDevice = false;
+    try {
+      isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+    } catch {
+      isTouchDevice = true;
+    }
     if (isTouchDevice) {
       requestAnimationFrame(() => {
         ScrollTrigger.refresh();

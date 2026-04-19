@@ -5,18 +5,26 @@ import { useSyncExternalStore } from "react";
 const QUERY = "(min-width: 1024px)";
 
 function subscribe(onChange: () => void) {
-  const mq = window.matchMedia(QUERY);
-  if (typeof mq.addEventListener === "function") {
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
+  try {
+    const mq = window.matchMedia(QUERY);
+    if (typeof mq.addEventListener === "function") {
+      mq.addEventListener("change", onChange);
+      return () => mq.removeEventListener("change", onChange);
+    }
+    // Safari fallback (older iOS): MediaQueryList uses addListener/removeListener.
+    mq.addListener(onChange);
+    return () => mq.removeListener(onChange);
+  } catch {
+    return () => {};
   }
-  // Safari fallback (older iOS): MediaQueryList uses addListener/removeListener.
-  mq.addListener(onChange);
-  return () => mq.removeListener(onChange);
 }
 
 function getSnapshot() {
-  return window.matchMedia(QUERY).matches;
+  try {
+    return window.matchMedia(QUERY).matches;
+  } catch {
+    return false;
+  }
 }
 
 function getServerSnapshot() {
@@ -31,17 +39,25 @@ export function useLgUp() {
 const XL_QUERY = "(min-width: 1280px)";
 
 function subscribeXl(onChange: () => void) {
-  const mq = window.matchMedia(XL_QUERY);
-  if (typeof mq.addEventListener === "function") {
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
+  try {
+    const mq = window.matchMedia(XL_QUERY);
+    if (typeof mq.addEventListener === "function") {
+      mq.addEventListener("change", onChange);
+      return () => mq.removeEventListener("change", onChange);
+    }
+    mq.addListener(onChange);
+    return () => mq.removeListener(onChange);
+  } catch {
+    return () => {};
   }
-  mq.addListener(onChange);
-  return () => mq.removeListener(onChange);
 }
 
 function getSnapshotXl() {
-  return window.matchMedia(XL_QUERY).matches;
+  try {
+    return window.matchMedia(XL_QUERY).matches;
+  } catch {
+    return false;
+  }
 }
 
 /** True from Tailwind `xl` (1280px). SSR defaults to false. */
