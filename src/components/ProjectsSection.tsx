@@ -221,7 +221,7 @@ export default function ProjectsSection() {
     <section
       ref={section}
       id="projects"
-      className="relative mt-0 flex w-full flex-col items-center overflow-hidden max-lg:mt-24"
+      className="relative mt-0 flex w-full flex-col items-center overflow-hidden max-lg:mt-8"
       style={{ background: "var(--background)", paddingTop: "12px", paddingBottom: "80px" }}
     >
       <div className="absolute inset-0 bg-grid opacity-10" />
