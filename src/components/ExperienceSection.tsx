@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -89,7 +89,9 @@ export default function ExperienceSection() {
     d: mobileWeavePathDFallback(experiences.length, fallbackH),
   }));
 
-  const syncWeaveFromLayout = () => {
+  const syncDebounceRef = useRef<number | null>(null);
+
+  const syncWeaveFromLayout = useCallback(() => {
     if (typeof window === "undefined") return;
     try {
       if (!window.matchMedia("(max-width: 1023px)").matches) return;
@@ -103,34 +105,59 @@ export default function ExperienceSection() {
     } catch {
       /* layout/measure must never take down the app shell (e.g. odd WebViews) */
     }
-  };
+  }, []);
+
+  const scheduleSyncWeave = useCallback(() => {
+    if (typeof window === "undefined") return;
+    if (syncDebounceRef.current) clearTimeout(syncDebounceRef.current);
+    syncDebounceRef.current = window.setTimeout(() => {
+      syncDebounceRef.current = null;
+      syncWeaveFromLayout();
+    }, 120);
+  }, [syncWeaveFromLayout]);
 
   useLayoutEffect(() => {
-    syncWeaveFromLayout();
-    const el = entriesRef.current;
-    if (!el || typeof ResizeObserver === "undefined") return;
-    const ro = new ResizeObserver(() => {
-      requestAnimationFrame(syncWeaveFromLayout);
-    });
-    ro.observe(el);
-    window.addEventListener("resize", syncWeaveFromLayout);
+    const runTwice = () => {
+      requestAnimationFrame(() => {
+        syncWeaveFromLayout();
+        requestAnimationFrame(syncWeaveFromLayout);
+      });
+    };
+    runTwice();
+
+    window.addEventListener("resize", scheduleSyncWeave);
+    window.addEventListener("orientationchange", scheduleSyncWeave);
+
     const mq = window.matchMedia("(max-width: 1023px)");
-    const onBreakpoint = () => requestAnimationFrame(syncWeaveFromLayout);
+    const onBreakpoint = () => scheduleSyncWeave();
     if (typeof mq.addEventListener === "function") {
       mq.addEventListener("change", onBreakpoint);
     } else {
       mq.addListener(onBreakpoint);
     }
+
+    let cancelled = false;
+    const fonts = document.fonts;
+    if (fonts?.ready) {
+      fonts.ready
+        .then(() => {
+          if (!cancelled) scheduleSyncWeave();
+        })
+        .catch(() => {});
+    }
+
     return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", syncWeaveFromLayout);
+      cancelled = true;
+      if (syncDebounceRef.current) clearTimeout(syncDebounceRef.current);
+      window.removeEventListener("resize", scheduleSyncWeave);
+      window.removeEventListener("orientationchange", scheduleSyncWeave);
       if (typeof mq.removeEventListener === "function") {
         mq.removeEventListener("change", onBreakpoint);
       } else {
         mq.removeListener(onBreakpoint);
       }
     };
-  }, []);
+  }, [syncWeaveFromLayout, scheduleSyncWeave]);
 
   const lineHeight = experiences.length * 280 + 80;
   const entriesMinHeight = lgUp ? lineHeight : Math.max(lineHeight, weaveGeom.H);
@@ -162,10 +189,22 @@ export default function ExperienceSection() {
     return () => ctx.revert();
   }, [weaveGeom]);
 
+  const stDebounceRef = useRef<number | null>(null);
   useEffect(() => {
-    requestAnimationFrame(() => {
-      ScrollTrigger.refresh();
-    });
+    if (stDebounceRef.current) clearTimeout(stDebounceRef.current);
+    stDebounceRef.current = window.setTimeout(() => {
+      stDebounceRef.current = null;
+      requestAnimationFrame(() => {
+        try {
+          ScrollTrigger.refresh();
+        } catch {
+          /* ignore */
+        }
+      });
+    }, 280);
+    return () => {
+      if (stDebounceRef.current) clearTimeout(stDebounceRef.current);
+    };
   }, [weaveGeom]);
 
   useEffect(() => {
