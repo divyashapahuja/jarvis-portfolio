@@ -74,51 +74,43 @@ export default function HeroScannerSection() {
   const aboutEl = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let ctx: gsap.Context | null = null;
-    try {
-      ctx = gsap.context(() => {
+    const ctx = gsap.context(() => {
       const lgUp = window.matchMedia("(min-width: 1024px)").matches;
 
-      // Mobile: scrubbed hero→scanner without `pin` (ScrollTrigger pin + overflow is a common Android crash).
+      // Mobile: short pinned scroll-driven transition (hero -> scanner) so it stays in-view.
       if (!lgUp) {
-        const sec = section.current;
-        const hero = heroContent.current;
-        const desk = deskWrap.current;
-        const scanW = scannerWrap.current;
-        const flashEl = flash.current;
-        const line = scanLine.current;
-        const count = counter.current;
-        if (!sec || !hero || !desk || !scanW || !flashEl || !line || !count) return;
-
-        gsap.set(hero, { opacity: 1, y: 0 });
-        gsap.set(desk, { opacity: 1 });
-        gsap.set(scanW, { opacity: 0 });
-        if (scannerColumnRef.current) gsap.set(scannerColumnRef.current, { opacity: 1 });
-        gsap.set(flashEl, { opacity: 0 });
-        gsap.set(line, { top: "100%" });
-        gsap.set(count, { textContent: "0" });
+        gsap.set(heroContent.current, { opacity: 1, y: 0 });
+        gsap.set(deskWrap.current, { opacity: 1 });
+        gsap.set(scannerWrap.current, { opacity: 0 });
+        gsap.set(scannerColumnRef.current, { opacity: 1 });
+        gsap.set(flash.current, { opacity: 0 });
+        gsap.set(scanLine.current, { top: "100%" });
+        gsap.set(counter.current, { textContent: "0" });
         if (circleProgress.current) gsap.set(circleProgress.current, { strokeDashoffset: CIRCUMFERENCE });
         const bioRefsMobile = [nameEl.current, locEl.current, skillsEl.current, aboutEl.current].filter(Boolean);
         if (bioRefsMobile.length) gsap.set(bioRefsMobile, { opacity: 0, x: 0 });
 
         const mobileTl = gsap.timeline({
           scrollTrigger: {
-            trigger: sec,
+            trigger: section.current,
             start: "top top",
+            // ~25% more scroll than prior mobile pin so scan + folder beats read clearly.
             end: "+=132%",
-            pin: false,
+            pin: true,
+            pinType: "fixed",
             scrub: 0.72,
+            anticipatePin: 1,
           },
         });
 
         // Crossfade hero → scanner (opacity only — no layout offset).
-        mobileTl.to(hero, { opacity: 0, duration: 0.26, ease: "power2.inOut" }, 0.05);
-        mobileTl.to(desk, { opacity: 0, duration: 0.28, ease: "power2.inOut" }, "<0.06");
-        mobileTl.to(scanW, { opacity: 1, duration: 0.32, ease: "power2.out" }, "<0.14");
-        mobileTl.to(flashEl, { opacity: 0.14, duration: 0.08, ease: "sine.out" }, 0.18);
-        mobileTl.to(flashEl, { opacity: 0, duration: 0.16, ease: "sine.in" }, 0.24);
-        mobileTl.fromTo(line, { top: "100%" }, { top: "0%", duration: 0.58, ease: "power1.inOut" }, 0.26);
-        mobileTl.fromTo(count, { textContent: "0" }, { textContent: "100", snap: { textContent: 1 }, duration: 0.58, ease: "power1.inOut" }, 0.26);
+        mobileTl.to(heroContent.current, { opacity: 0, duration: 0.26, ease: "power2.inOut" }, 0.05);
+        mobileTl.to(deskWrap.current, { opacity: 0, duration: 0.28, ease: "power2.inOut" }, "<0.06");
+        mobileTl.to(scannerWrap.current, { opacity: 1, duration: 0.32, ease: "power2.out" }, "<0.14");
+        mobileTl.to(flash.current, { opacity: 0.14, duration: 0.08, ease: "sine.out" }, 0.18);
+        mobileTl.to(flash.current, { opacity: 0, duration: 0.16, ease: "sine.in" }, 0.24);
+        mobileTl.fromTo(scanLine.current, { top: "100%" }, { top: "0%", duration: 0.58, ease: "power1.inOut" }, 0.26);
+        mobileTl.fromTo(counter.current, { textContent: "0" }, { textContent: "100", snap: { textContent: 1 }, duration: 0.58, ease: "power1.inOut" }, 0.26);
         if (circleProgress.current) {
           mobileTl.fromTo(
             circleProgress.current,
@@ -282,20 +274,15 @@ export default function HeroScannerSection() {
         tl.to(scanCol, { opacity: 0, duration: 0.08, ease: "none" }, 0.92);
       }
     }, section);
-    } catch {
-      /* avoid blank tab on strict WebViews */
-    }
 
-    return () => {
-      ctx?.revert();
-    };
+    return () => ctx.revert();
   }, []);
 
   return (
     <section
       ref={section}
       id="hero"
-      className="relative h-[100svh] w-full max-w-full overflow-x-hidden overflow-y-hidden lg:h-[100dvh] lg:min-h-[100svh] xl:overflow-x-visible"
+      className="relative h-[100svh] w-full max-w-full overflow-x-hidden max-lg:overflow-y-visible lg:overflow-y-hidden lg:h-[100dvh] lg:min-h-[100svh] xl:overflow-x-visible"
       style={{ background: "var(--background)" }}
     >
       <div className="absolute inset-0 bg-grid opacity-30" />

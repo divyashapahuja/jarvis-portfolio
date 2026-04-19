@@ -24,6 +24,12 @@ export default function SmoothScroll({
       isTouchDevice = true;
     }
     if (isTouchDevice) {
+      try {
+        // Reduces pin/layout thrash when the mobile browser chrome resizes the viewport.
+        ScrollTrigger.config({ ignoreMobileResize: true });
+      } catch {
+        /* ignore */
+      }
       requestAnimationFrame(() => {
         ScrollTrigger.refresh();
       });
