@@ -17,6 +17,14 @@ export default function SmoothScroll({
   const rafCb = useRef<((time: number) => void) | null>(null);
 
   useEffect(() => {
+    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+    if (isTouchDevice) {
+      requestAnimationFrame(() => {
+        ScrollTrigger.refresh();
+      });
+      return;
+    }
+
     const lenis = new Lenis({
       lerp: 0.09,
       smoothWheel: true,

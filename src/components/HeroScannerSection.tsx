@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useXlUp } from "@/hooks/useLgUp";
 import { portfolioProfile } from "@/lib/projects";
 
 if (typeof window !== "undefined") {
@@ -58,7 +57,6 @@ function BioCard({
 }
 
 export default function HeroScannerSection() {
-  const xlUp = useXlUp();
   const section = useRef<HTMLElement>(null);
   const heroContent = useRef<HTMLDivElement>(null);
   const deskWrap = useRef<HTMLDivElement>(null);
@@ -225,8 +223,7 @@ export default function HeroScannerSection() {
       <div
         ref={scannerWrap}
         id="scanner"
-        className="absolute inset-0 z-20 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-y-auto overflow-x-hidden opacity-0 xl:overflow-x-visible xl:overflow-y-visible"
-        {...(!xlUp ? { "data-lenis-prevent": "" as const } : {})}
+        className="pointer-events-none absolute inset-0 z-20 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-y-auto overflow-x-hidden opacity-0 xl:overflow-x-visible xl:overflow-y-visible"
       >
         <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-6 sm:px-4 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:px-0">
           <div
