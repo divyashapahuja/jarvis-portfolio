@@ -96,14 +96,14 @@ export default function HeroScannerSection() {
           scrollTrigger: {
             trigger: section.current,
             start: "top top",
-            end: "+=120%",
+            end: "+=90%",
             scrub: 0.6,
           },
         });
 
         mobileTl.to(heroContent.current, { opacity: 0, y: -24, duration: 0.20 }, 0.05);
-        mobileTl.to(deskWrap.current, { opacity: 0, duration: 0.22 }, 0.18);
-        mobileTl.to(scannerWrap.current, { opacity: 1, duration: 0.20 }, 0.22);
+        mobileTl.to(deskWrap.current, { opacity: 0, duration: 0.22 }, 0.14);
+        mobileTl.to(scannerWrap.current, { opacity: 1, duration: 0.20 }, 0.16);
         mobileTl.fromTo(scanLine.current, { top: "100%" }, { top: "26%", duration: 0.50, ease: "none" }, 0.34);
         mobileTl.fromTo(counter.current, { textContent: "0" }, { textContent: "74", snap: { textContent: 1 }, duration: 0.50, ease: "none" }, 0.34);
         if (circleProgress.current) {
@@ -235,7 +235,7 @@ export default function HeroScannerSection() {
     <section
       ref={section}
       id="hero"
-      className="relative min-h-[120svh] w-full max-w-full overflow-x-hidden overflow-y-visible lg:h-[100dvh] lg:min-h-[100svh] lg:overflow-y-hidden xl:overflow-x-visible"
+      className="relative min-h-[170svh] w-full max-w-full overflow-x-hidden overflow-y-visible lg:h-[100dvh] lg:min-h-[100svh] lg:overflow-y-hidden xl:overflow-x-visible"
       style={{ background: "var(--background)" }}
     >
       <div className="absolute inset-0 bg-grid opacity-30" />
@@ -277,7 +277,7 @@ export default function HeroScannerSection() {
       <div
         ref={scannerWrap}
         id="scanner"
-        className="pointer-events-none absolute inset-0 z-20 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-y-auto overflow-x-hidden opacity-0 xl:overflow-x-visible xl:overflow-y-visible"
+        className="pointer-events-none sticky top-0 z-20 flex h-[100svh] max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-y-auto overflow-x-hidden opacity-0 lg:absolute lg:inset-0 lg:h-auto xl:overflow-x-visible xl:overflow-y-visible"
       >
         <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-20 pt-2 sm:px-4 sm:pb-24 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:pt-0 xl:px-0">
           <div
