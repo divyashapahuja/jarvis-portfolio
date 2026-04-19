@@ -75,8 +75,14 @@ export default function Navbar() {
 
   const handleClick = useCallback((link: NavLink) => {
     if (link.scrollToScanComplete) {
-      const target = 0.80 * 2.0 * window.innerHeight;
-      window.scrollTo({ top: target, behavior: "smooth" });
+      const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+      if (isDesktop) {
+        const target = 0.80 * 2.0 * window.innerHeight;
+        window.scrollTo({ top: target, behavior: "smooth" });
+      } else {
+        const el = document.querySelector(link.href);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     } else {
       const el = document.querySelector(link.href);
       if (el) el.scrollIntoView({ behavior: "smooth" });
