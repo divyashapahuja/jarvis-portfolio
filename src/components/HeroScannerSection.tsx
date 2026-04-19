@@ -94,7 +94,8 @@ export default function HeroScannerSection() {
           scrollTrigger: {
             trigger: section.current,
             start: "top top",
-            end: "+=105%",
+            // ~25% more scroll than prior mobile pin so scan + folder beats read clearly.
+            end: "+=132%",
             pin: true,
             pinType: "fixed",
             scrub: 0.55,
@@ -105,18 +106,34 @@ export default function HeroScannerSection() {
         mobileTl.to(heroContent.current, { opacity: 0, y: -24, duration: 0.16 }, 0.05);
         mobileTl.to(deskWrap.current, { opacity: 0, duration: 0.18 }, 0.14);
         mobileTl.to(scannerWrap.current, { opacity: 1, duration: 0.18 }, 0.16);
-        mobileTl.fromTo(scanLine.current, { top: "100%" }, { top: "24%", duration: 0.52, ease: "none" }, 0.30);
-        mobileTl.fromTo(counter.current, { textContent: "0" }, { textContent: "76", snap: { textContent: 1 }, duration: 0.52, ease: "none" }, 0.30);
+        mobileTl.fromTo(scanLine.current, { top: "100%" }, { top: "0%", duration: 0.58, ease: "none" }, 0.26);
+        mobileTl.fromTo(counter.current, { textContent: "0" }, { textContent: "100", snap: { textContent: 1 }, duration: 0.58, ease: "none" }, 0.26);
         if (circleProgress.current) {
           mobileTl.fromTo(
             circleProgress.current,
             { strokeDashoffset: CIRCUMFERENCE },
-            { strokeDashoffset: CIRCUMFERENCE * 0.24, duration: 0.52, ease: "none" },
-            0.30,
+            { strokeDashoffset: 0, duration: 0.58, ease: "none" },
+            0.26,
           );
         }
-        if (bioRefsMobile.length) {
-          mobileTl.to(bioRefsMobile, { opacity: 1, duration: 0.2, stagger: 0.06 }, 0.62);
+        // Each folder gets its own beat (~25% more scroll vs one short stagger block).
+        const revealDur = 0.12;
+        const step = 0.14;
+        let t = 0.62;
+        if (nameEl.current) {
+          mobileTl.to(nameEl.current, { opacity: 1, x: 0, duration: revealDur }, t);
+          t += step;
+        }
+        if (locEl.current) {
+          mobileTl.to(locEl.current, { opacity: 1, x: 0, duration: revealDur }, t);
+          t += step;
+        }
+        if (skillsEl.current) {
+          mobileTl.to(skillsEl.current, { opacity: 1, x: 0, duration: revealDur }, t);
+          t += step;
+        }
+        if (aboutEl.current) {
+          mobileTl.to(aboutEl.current, { opacity: 1, x: 0, duration: revealDur }, t);
         }
         return;
       }
@@ -249,7 +266,7 @@ export default function HeroScannerSection() {
       {/* Hero content */}
       <div
         ref={heroContent}
-        className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none px-4 pb-32 sm:pb-40 lg:pb-[280px]"
+        className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none px-4 pb-32 max-lg:-translate-y-[10svh] max-lg:pb-10 sm:pb-40 lg:translate-y-0 lg:pb-[280px]"
       >
         <p className="text-[10px] tracking-[0.5em] uppercase text-neon/50 mb-4" style={{ fontFamily: "IBM Plex Mono, monospace" }}>Portfolio</p>
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white text-glow tracking-wider text-center" style={{ fontFamily: "Orbitron, sans-serif" }}>JANE DOE</h1>
@@ -257,7 +274,7 @@ export default function HeroScannerSection() {
       </div>
 
       {/* Desk image */}
-      <div ref={deskWrap} className="absolute inset-0 z-10 flex items-end justify-center pb-6 sm:pb-10">
+      <div ref={deskWrap} className="absolute inset-0 z-10 flex items-end justify-center pb-6 max-lg:-translate-y-[10svh] max-lg:items-center max-lg:pb-28 sm:pb-10 lg:translate-y-0 lg:items-end lg:pb-6">
         <div className="animate-float">
           <div ref={deskScale}>
             <Image
@@ -283,27 +300,29 @@ export default function HeroScannerSection() {
         <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-20 pt-2 sm:px-4 sm:pb-24 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:pt-0 xl:px-0">
           <div
             ref={scannerColumnRef}
-            className="relative w-full max-w-[380px] shrink-0 max-xl:pb-32 sm:max-xl:pb-36 xl:absolute xl:left-1/2 xl:top-1/2 xl:max-w-none xl:w-auto xl:-translate-x-1/2 xl:-translate-y-1/2 xl:pb-0"
+            className="relative w-full max-w-[380px] shrink-0 max-xl:pb-40 sm:max-xl:pb-44 xl:absolute xl:left-1/2 xl:top-1/2 xl:max-w-none xl:w-auto xl:-translate-x-1/2 xl:-translate-y-1/2 xl:pb-0"
             style={{ marginTop: "12px" }}
           >
-            <Image
-              src="/scanner.png"
-              alt="Character being scanned"
-              width={520}
-              height={680}
-              sizes="(max-width: 1023px) 90vw, 520px"
-              className="h-auto w-full max-w-full select-none xl:w-[520px]"
-              draggable={false}
-            />
-            <div
-              ref={scanLine}
-              className="absolute left-0 right-0 z-10 h-[3px] pointer-events-none"
-              style={{
-                top: "100%",
-                background: "linear-gradient(90deg, transparent 0%, var(--teal) 20%, var(--teal) 80%, transparent 100%)",
-                boxShadow: "var(--teal-glow-strong)",
-              }}
-            />
+            <div className="relative w-full max-lg:mt-8 max-lg:translate-y-4">
+              <Image
+                src="/scanner.png"
+                alt="Character being scanned"
+                width={520}
+                height={680}
+                sizes="(max-width: 1023px) 90vw, 520px"
+                className="h-auto w-full max-w-full select-none xl:w-[520px]"
+                draggable={false}
+              />
+              <div
+                ref={scanLine}
+                className="absolute left-0 right-0 z-10 h-[3px] pointer-events-none"
+                style={{
+                  top: "100%",
+                  background: "linear-gradient(90deg, transparent 0%, var(--teal) 20%, var(--teal) 80%, transparent 100%)",
+                  boxShadow: "var(--teal-glow-strong)",
+                }}
+              />
+            </div>
 
             {/* Scan complete */}
             <div
@@ -321,7 +340,7 @@ export default function HeroScannerSection() {
             </div>
 
             {/* Circular scan gauge */}
-            <div className="absolute bottom-[-84px] left-1/2 -translate-x-1/2 sm:bottom-[-120px]">
+            <div className="absolute bottom-[-84px] left-1/2 -translate-x-1/2 max-lg:relative max-lg:bottom-auto max-lg:mt-8 sm:bottom-[-120px]">
               <div className="relative" style={{ width: 90, height: 90 }}>
                 <svg width="90" height="90" viewBox="0 0 90 90" className="absolute inset-0">
                   <circle cx="45" cy="45" r={CIRCLE_R + 8} stroke="rgba(0,212,200,0.06)" strokeWidth="1" fill="none" />
@@ -365,7 +384,7 @@ export default function HeroScannerSection() {
           </div>
 
           {/* Bio cards — column below ~1280px; orbit HUD only on xl+ (avoids clipping inside overflow-hidden hero) */}
-          <div className="relative z-30 mt-8 flex w-full max-w-md flex-col gap-3 sm:max-w-lg max-xl:mt-10 xl:absolute xl:inset-0 xl:mt-0 xl:max-w-none xl:min-h-0 xl:pointer-events-none">
+          <div className="relative z-30 mt-8 flex w-full max-w-md flex-col gap-3 max-lg:mt-10 max-lg:pb-6 sm:max-w-lg max-xl:mt-10 xl:absolute xl:inset-0 xl:mt-0 xl:max-w-none xl:min-h-0 xl:pointer-events-none">
             {/* xl+: anchor HUD to viewport center so cards stay in-frame on laptops (old negative left/right sat off-screen) */}
             <div className="w-full xl:pointer-events-auto xl:absolute xl:bottom-[12%] xl:left-[max(0.75rem,calc(50%-31rem))] xl:w-auto xl:max-w-[min(16rem,42vw)]">
               <BioCard label="Name" side="left" innerRef={nameEl}>
