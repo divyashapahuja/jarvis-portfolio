@@ -94,12 +94,8 @@ export default function HeroScannerSection() {
           scrollTrigger: {
             trigger: section.current,
             start: "top top",
-            // ~25% more scroll than prior mobile pin so scan + folder beats read clearly.
             end: "+=132%",
-            pin: true,
-            pinType: "fixed",
             scrub: 0.72,
-            anticipatePin: 1,
           },
         });
 
@@ -175,7 +171,6 @@ export default function HeroScannerSection() {
           start: "top top",
           end: pinEnd,
           pin: lgUp,
-          pinType: "fixed",
           scrub: 0.5,
           anticipatePin: 1,
         },
@@ -282,7 +277,7 @@ export default function HeroScannerSection() {
     <section
       ref={section}
       id="hero"
-      className="relative h-[100svh] w-full max-w-full overflow-x-hidden max-lg:overflow-y-visible lg:overflow-y-hidden lg:h-[100dvh] lg:min-h-[100svh] xl:overflow-x-visible"
+      className="relative h-[100svh] w-full max-w-full overflow-x-hidden max-lg:overflow-y-visible max-lg:min-h-[232vh] lg:overflow-y-hidden lg:h-[100dvh] lg:min-h-[100svh] xl:overflow-x-visible"
       style={{ background: "var(--background)" }}
     >
       <div className="absolute inset-0 bg-grid opacity-30" />

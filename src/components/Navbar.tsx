@@ -163,7 +163,7 @@ export default function Navbar() {
           />
           <div
             className="absolute top-0 right-0 flex h-full w-[min(100%,320px)] flex-col border-l border-neon/20 bg-[rgba(5,5,8,0.98)] shadow-[0_0_40px_rgba(0,212,200,0.08)]"
-            style={{ paddingTop: "max(1.25rem, env(safe-area-inset-top))" }}
+            className="pt-[max(1.25rem,env(safe-area-inset-top))]"
           >
             <div className="flex items-center justify-between border-b border-neon/10 px-4 py-3">
               <span className="text-[10px] tracking-[0.3em] text-neon/50" style={{ fontFamily: "IBM Plex Mono, monospace" }}>
