@@ -77,18 +77,47 @@ export default function HeroScannerSection() {
     const ctx = gsap.context(() => {
       const lgUp = window.matchMedia("(min-width: 1024px)").matches;
 
-      // Mobile fallback: render as a stable stacked layout (no pinned transition).
+      // Mobile: short pinned scroll-driven transition (hero -> scanner) so it stays in-view.
       if (!lgUp) {
         gsap.set(heroContent.current, { opacity: 1, y: 0 });
         gsap.set(deskWrap.current, { opacity: 1 });
-        gsap.set(scannerWrap.current, { opacity: 1 });
+        gsap.set(scannerWrap.current, { opacity: 0 });
         gsap.set(scannerColumnRef.current, { opacity: 1 });
         gsap.set(flash.current, { opacity: 0 });
-        gsap.set(scanLine.current, { top: "42%" });
-        gsap.set(counter.current, { textContent: "74" });
-        if (circleProgress.current) gsap.set(circleProgress.current, { strokeDashoffset: CIRCUMFERENCE * 0.26 });
+        gsap.set(scanLine.current, { top: "100%" });
+        gsap.set(counter.current, { textContent: "0" });
+        if (circleProgress.current) gsap.set(circleProgress.current, { strokeDashoffset: CIRCUMFERENCE });
         const bioRefsMobile = [nameEl.current, locEl.current, skillsEl.current, aboutEl.current].filter(Boolean);
-        if (bioRefsMobile.length) gsap.set(bioRefsMobile, { opacity: 1, x: 0 });
+        if (bioRefsMobile.length) gsap.set(bioRefsMobile, { opacity: 0, x: 0 });
+
+        const mobileTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section.current,
+            start: "top top",
+            end: "+=105%",
+            pin: true,
+            pinType: "fixed",
+            scrub: 0.55,
+            anticipatePin: 1,
+          },
+        });
+
+        mobileTl.to(heroContent.current, { opacity: 0, y: -24, duration: 0.16 }, 0.05);
+        mobileTl.to(deskWrap.current, { opacity: 0, duration: 0.18 }, 0.14);
+        mobileTl.to(scannerWrap.current, { opacity: 1, duration: 0.18 }, 0.16);
+        mobileTl.fromTo(scanLine.current, { top: "100%" }, { top: "24%", duration: 0.52, ease: "none" }, 0.30);
+        mobileTl.fromTo(counter.current, { textContent: "0" }, { textContent: "76", snap: { textContent: 1 }, duration: 0.52, ease: "none" }, 0.30);
+        if (circleProgress.current) {
+          mobileTl.fromTo(
+            circleProgress.current,
+            { strokeDashoffset: CIRCUMFERENCE },
+            { strokeDashoffset: CIRCUMFERENCE * 0.24, duration: 0.52, ease: "none" },
+            0.30,
+          );
+        }
+        if (bioRefsMobile.length) {
+          mobileTl.to(bioRefsMobile, { opacity: 1, duration: 0.2, stagger: 0.06 }, 0.62);
+        }
         return;
       }
 
@@ -207,7 +236,7 @@ export default function HeroScannerSection() {
     <section
       ref={section}
       id="hero"
-      className="relative w-full max-w-full overflow-x-hidden overflow-y-visible lg:h-[100dvh] lg:min-h-[100svh] lg:overflow-y-hidden xl:overflow-x-visible"
+      className="relative h-[100svh] w-full max-w-full overflow-x-hidden overflow-y-hidden lg:h-[100dvh] lg:min-h-[100svh] xl:overflow-x-visible"
       style={{ background: "var(--background)" }}
     >
       <div className="absolute inset-0 bg-grid opacity-30" />
@@ -220,7 +249,7 @@ export default function HeroScannerSection() {
       {/* Hero content */}
       <div
         ref={heroContent}
-        className="relative z-10 flex flex-col items-center justify-center px-4 pb-10 pt-24 sm:pb-12 lg:pointer-events-none lg:absolute lg:inset-0 lg:pb-[280px] lg:pt-0"
+        className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none px-4 pb-32 sm:pb-40 lg:pb-[280px]"
       >
         <p className="text-[10px] tracking-[0.5em] uppercase text-neon/50 mb-4" style={{ fontFamily: "IBM Plex Mono, monospace" }}>Portfolio</p>
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white text-glow tracking-wider text-center" style={{ fontFamily: "Orbitron, sans-serif" }}>JANE DOE</h1>
@@ -228,7 +257,7 @@ export default function HeroScannerSection() {
       </div>
 
       {/* Desk image */}
-      <div ref={deskWrap} className="relative z-10 flex items-end justify-center pb-6 sm:pb-10 lg:absolute lg:inset-0">
+      <div ref={deskWrap} className="absolute inset-0 z-10 flex items-end justify-center pb-6 sm:pb-10">
         <div className="animate-float">
           <div ref={deskScale}>
             <Image
@@ -249,7 +278,7 @@ export default function HeroScannerSection() {
       <div
         ref={scannerWrap}
         id="scanner"
-        className="pointer-events-none relative z-20 mt-4 flex w-full items-center justify-center overflow-y-visible overflow-x-hidden opacity-100 lg:absolute lg:inset-0 lg:mt-0 lg:h-auto lg:opacity-0 xl:overflow-x-visible xl:overflow-y-visible"
+        className="pointer-events-none absolute inset-0 z-20 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-y-auto overflow-x-hidden opacity-0 xl:overflow-x-visible xl:overflow-y-visible"
       >
         <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-20 pt-2 sm:px-4 sm:pb-24 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:pt-0 xl:px-0">
           <div
