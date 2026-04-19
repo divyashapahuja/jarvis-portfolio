@@ -24,7 +24,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main>
+    <main className="w-full min-w-0 overflow-x-clip">
       <Navbar />
       <HeroScannerSection />
       <ProjectsSection />

@@ -183,7 +183,7 @@ export default function HeroScannerSection() {
     <section
       ref={section}
       id="hero"
-      className="relative h-screen w-full overflow-x-hidden overflow-y-hidden xl:overflow-x-visible"
+      className="relative h-[100dvh] min-h-[100svh] w-full max-w-full overflow-x-hidden overflow-y-hidden xl:overflow-x-visible"
       style={{ background: "var(--background)" }}
     >
       <div className="absolute inset-0 bg-grid opacity-30" />
@@ -228,10 +228,10 @@ export default function HeroScannerSection() {
         className="absolute inset-0 z-20 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-y-auto overflow-x-hidden opacity-0 xl:overflow-x-visible xl:overflow-y-visible"
         {...(!xlUp ? { "data-lenis-prevent": "" as const } : {})}
       >
-        <div className="relative flex w-full max-w-[100vw] flex-col items-center px-3 pb-6 sm:px-4 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:px-0">
+        <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-6 sm:px-4 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:px-0">
           <div
             ref={scannerColumnRef}
-            className="relative w-full max-w-[min(100vw-1.5rem,380px)] shrink-0 max-xl:pb-32 sm:max-xl:pb-36 xl:absolute xl:left-1/2 xl:top-1/2 xl:max-w-none xl:w-auto xl:-translate-x-1/2 xl:-translate-y-1/2 xl:pb-0"
+            className="relative w-full max-w-[380px] shrink-0 max-xl:pb-32 sm:max-xl:pb-36 xl:absolute xl:left-1/2 xl:top-1/2 xl:max-w-none xl:w-auto xl:-translate-x-1/2 xl:-translate-y-1/2 xl:pb-0"
             style={{ marginTop: "12px" }}
           >
             <Image

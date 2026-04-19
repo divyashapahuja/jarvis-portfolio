@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import ChatBot from "@/components/ChatBot";
@@ -7,6 +7,12 @@ import { CustomCursor } from "@/components/ClientOnly";
 export const metadata: Metadata = {
   title: "Jane Doe — Portfolio",
   description: "Scroll-driven animated portfolio",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

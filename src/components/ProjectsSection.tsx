@@ -63,7 +63,7 @@ function HoloCard({
 
   return (
     <div
-      className="absolute top-1/2 left-1/2 w-[min(calc(100vw-2rem),540px)] max-w-[540px] transition-all duration-500 ease-out lg:w-[540px]"
+      className="absolute top-1/2 left-1/2 w-[min(540px,calc(100%-1.5rem))] max-w-full transition-all duration-500 ease-out lg:w-[540px]"
       style={{
         ...styles,
         transformStyle: "preserve-3d",
@@ -235,7 +235,7 @@ export default function ProjectsSection() {
 
       <div
         ref={stage}
-        className="relative h-[400px] w-full cursor-grab select-none active:cursor-grabbing sm:h-[380px] lg:h-[360px] lg:px-0"
+        className="relative h-[400px] w-full min-w-0 max-w-full cursor-grab select-none overflow-x-clip px-2 active:cursor-grabbing sm:h-[380px] sm:px-3 lg:h-[360px] lg:overflow-visible lg:px-0"
         style={{ perspective: lgUp ? "1200px" : "none" }}
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}

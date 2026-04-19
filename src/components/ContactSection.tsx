@@ -126,13 +126,13 @@ export default function ContactSection() {
   const dArc3 = dotArc(110, 200, 350, 18);
 
   return (
-    <section ref={section} id="contact" className="relative min-h-screen w-full flex flex-col items-center justify-center py-20" style={{ background: "var(--background)" }}>
+    <section ref={section} id="contact" className="relative flex min-h-[100dvh] w-full max-w-full flex-col items-center justify-center overflow-x-clip py-16 sm:py-20" style={{ background: "var(--background)" }}>
       <div className="absolute inset-0 bg-grid opacity-8" />
 
       <p className="text-[10px] tracking-[0.5em] uppercase text-neon/40 mb-10" style={{ fontFamily: "IBM Plex Mono, monospace" }}>Contact</p>
 
-      <div className="relative w-[700px] h-[700px] max-w-[95vw] max-h-[95vw]">
-        <svg ref={svgRef} viewBox="0 0 700 700" className="w-full h-full" fill="none">
+      <div className="relative aspect-square w-full max-w-[min(700px,92vw)] overflow-hidden rounded-sm">
+        <svg ref={svgRef} viewBox="0 0 700 700" className="h-full w-full" fill="none">
           {/* Core */}
           <circle className="core-pulse" cx={CX} cy={CY} r={35} fill="rgba(0,212,200,0.1)" />
           <circle cx={CX} cy={CY} r={18} fill="rgba(0,212,200,0.15)" />
@@ -205,7 +205,7 @@ export default function ContactSection() {
 
           return (
             <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer"
-              className="node-label absolute opacity-0 text-sm text-neon/80 hover:text-neon transition-colors whitespace-nowrap"
+              className="node-label absolute whitespace-nowrap text-[10px] text-neon/80 opacity-0 transition-colors hover:text-neon sm:text-xs md:text-sm"
               style={{
                 fontFamily: "IBM Plex Mono, monospace",
                 left: `${pctX}%`,
