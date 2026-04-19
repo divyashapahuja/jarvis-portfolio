@@ -191,7 +191,6 @@ export default function ExperienceSection() {
 
   const stDebounceRef = useRef<number | null>(null);
   useEffect(() => {
-    if (typeof window === "undefined") return;
     if (stDebounceRef.current) clearTimeout(stDebounceRef.current);
     stDebounceRef.current = window.setTimeout(() => {
       stDebounceRef.current = null;
@@ -202,7 +201,7 @@ export default function ExperienceSection() {
           /* ignore */
         }
       });
-    }, 400);
+    }, 280);
     return () => {
       if (stDebounceRef.current) clearTimeout(stDebounceRef.current);
     };

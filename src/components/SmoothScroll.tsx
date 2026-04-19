@@ -17,44 +17,30 @@ export default function SmoothScroll({
   const rafCb = useRef<((time: number) => void) | null>(null);
 
   useEffect(() => {
-    let coarse = false;
+    let isTouchDevice = false;
     try {
-      coarse = window.matchMedia("(pointer: coarse)").matches;
+      isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
     } catch {
-      coarse = true;
+      isTouchDevice = true;
     }
-
-    if (coarse) {
+    if (isTouchDevice) {
       try {
+        // Reduces pin/layout thrash when the mobile browser chrome resizes the viewport.
         ScrollTrigger.config({ ignoreMobileResize: true });
       } catch {
         /* ignore */
       }
+      requestAnimationFrame(() => {
+        ScrollTrigger.refresh();
+      });
+      return;
     }
 
     const lenis = new Lenis({
-      lerp: coarse ? 0.14 : 0.09,
+      lerp: 0.09,
       smoothWheel: true,
+      // Let wheel events reach nested overflow:auto regions (hero scanner, modals, etc.)
       allowNestedScroll: true,
-      ...(coarse ? { syncTouch: true, syncTouchLerp: 0.12, touchMultiplier: 0.85 } : {}),
-    });
-
-    ScrollTrigger.scrollerProxy(document.documentElement, {
-      scrollTop(value?: number) {
-        if (arguments.length) {
-          const v = Number(value);
-          if (!Number.isNaN(v)) lenis.scrollTo(v, { immediate: true });
-        }
-        return lenis.scroll;
-      },
-      getBoundingClientRect() {
-        return {
-          top: 0,
-          left: 0,
-          width: window.innerWidth,
-          height: window.innerHeight,
-        };
-      },
     });
 
     lenis.on("scroll", ScrollTrigger.update);
@@ -70,12 +56,6 @@ export default function SmoothScroll({
     return () => {
       if (rafCb.current) gsap.ticker.remove(rafCb.current);
       lenis.destroy();
-      try {
-        ScrollTrigger.scrollerProxy(document.documentElement);
-        ScrollTrigger.refresh();
-      } catch {
-        /* ignore */
-      }
     };
   }, []);
 
