@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -8,16 +8,16 @@ if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 import { experiences } from "@/lib/projects";
+import { useLgUp } from "@/hooks/useLgUp";
 
-/** Mobile-only: vertical spine with horizontal weave (x in 0–100 viewBox units). */
-function mobileWeavePathD(n: number, H: number): string {
+/** Fallback weave before layout measure (SSR / first paint). */
+function mobileWeavePathDFallback(n: number, H: number): string {
   const mid = 50;
   const sway = 5;
   if (n <= 0) return `M ${mid} 0 L ${mid} ${H}`;
   const seg = H / n;
   let d = `M ${mid} 0`;
   for (let i = 0; i < n; i++) {
-    const y0 = i * seg;
     const y1 = i * seg + seg * 0.22;
     const y2 = i * seg + seg * 0.5;
     const y3 = i * seg + seg * 0.78;
@@ -32,16 +32,104 @@ function mobileWeavePathD(n: number, H: number): string {
   return d;
 }
 
+/** Build weave from measured `.exp-card` bands inside `entries` (mobile coordinates, y in px). */
+function weavePathFromMeasuredCards(entries: HTMLElement): { H: number; d: string } | null {
+  const rows = entries.querySelectorAll<HTMLElement>(".exp-timeline-row");
+  if (!rows.length) return null;
+
+  const bands: { top: number; bottom: number }[] = [];
+  const eRect = entries.getBoundingClientRect();
+
+  rows.forEach((row) => {
+    const card = row.querySelector<HTMLElement>(".exp-card");
+    if (!card) return;
+    const cRect = card.getBoundingClientRect();
+    const top = cRect.top - eRect.top + entries.scrollTop;
+    const bottom = cRect.bottom - eRect.top + entries.scrollTop;
+    bands.push({ top, bottom });
+  });
+
+  if (!bands.length) return null;
+
+  const mid = 50;
+  const sway = 5;
+  const pad = 28;
+  const H = Math.ceil(Math.max(...bands.map((b) => b.bottom)) + pad);
+
+  let d = `M ${mid} 0 L ${mid} ${bands[0].top}`;
+  for (let i = 0; i < bands.length; i++) {
+    const { top, bottom } = bands[i];
+    const yMid = (top + bottom) / 2;
+    const dx = i % 2 === 0 ? -sway : sway;
+    d += ` L ${mid + dx} ${yMid}`;
+    d += ` L ${mid} ${bottom}`;
+    if (i < bands.length - 1) {
+      d += ` L ${mid} ${bands[i + 1].top}`;
+    }
+  }
+  d += ` L ${mid} ${H}`;
+  return { H, d };
+}
+
 export default function ExperienceSection() {
   const section = useRef<HTMLElement>(null);
+  const entriesRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<SVGLineElement>(null);
   const weaveRef = useRef<SVGPathElement>(null);
+  const lgUp = useLgUp();
+
+  const fallbackH = experiences.length * 280 + 80;
+  const [weaveGeom, setWeaveGeom] = useState<{ H: number; d: string }>(() => ({
+    H: fallbackH,
+    d: mobileWeavePathDFallback(experiences.length, fallbackH),
+  }));
+
+  const syncWeaveFromLayout = () => {
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(max-width: 1023px)").matches) return;
+    const el = entriesRef.current;
+    if (!el) return;
+    const measured = weavePathFromMeasuredCards(el);
+    if (!measured) return;
+    setWeaveGeom(measured);
+  };
+
+  useLayoutEffect(() => {
+    syncWeaveFromLayout();
+    const el = entriesRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => {
+      requestAnimationFrame(syncWeaveFromLayout);
+    });
+    ro.observe(el);
+    window.addEventListener("resize", syncWeaveFromLayout);
+    const mq = window.matchMedia("(max-width: 1023px)");
+    const onBreakpoint = () => requestAnimationFrame(syncWeaveFromLayout);
+    if (typeof mq.addEventListener === "function") {
+      mq.addEventListener("change", onBreakpoint);
+    } else {
+      mq.addListener(onBreakpoint);
+    }
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", syncWeaveFromLayout);
+      if (typeof mq.removeEventListener === "function") {
+        mq.removeEventListener("change", onBreakpoint);
+      } else {
+        mq.removeListener(onBreakpoint);
+      }
+    };
+  }, []);
+
+  const lineHeight = experiences.length * 280 + 80;
+  const entriesMinHeight = lgUp ? lineHeight : Math.max(lineHeight, weaveGeom.H);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
       const drawStroke = (el: SVGGeometryElement | null) => {
         if (!el) return;
         const len = el.getTotalLength();
+        if (!len || Number.isNaN(len)) return;
         el.style.strokeDasharray = `${len}`;
         el.style.strokeDashoffset = `${len}`;
         gsap.to(el, {
@@ -58,8 +146,19 @@ export default function ExperienceSection() {
 
       drawStroke(lineRef.current);
       drawStroke(weaveRef.current);
+    }, section);
 
-      // Animate each card in
+    return () => ctx.revert();
+  }, [weaveGeom]);
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+    });
+  }, [weaveGeom]);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
       const cards = section.current?.querySelectorAll(".exp-card");
       const lgUp = typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches;
       cards?.forEach((card, i) => {
@@ -83,7 +182,6 @@ export default function ExperienceSection() {
         );
       });
 
-      // Animate year markers
       const markers = section.current?.querySelectorAll(".year-marker");
       markers?.forEach((m) => {
         gsap.fromTo(m,
@@ -105,9 +203,6 @@ export default function ExperienceSection() {
 
     return () => ctx.revert();
   }, []);
-
-  const lineHeight = experiences.length * 280 + 80;
-  const weaveD = mobileWeavePathD(experiences.length, lineHeight);
 
   return (
     <section
@@ -136,22 +231,22 @@ export default function ExperienceSection() {
 
       {/* Timeline */}
       <div className="relative mx-auto max-w-4xl px-4 sm:px-6">
-        {/* Mobile: woven path under panels (z-0). Desktop: simple vertical line (centered). */}
+        {/* Mobile: woven path from measured card heights */}
         <div
-          className="pointer-events-none absolute left-1/2 top-0 z-0 w-full max-w-4xl -translate-x-1/2 max-lg:px-4"
-          style={{ height: lineHeight }}
+          className="pointer-events-none absolute left-1/2 top-0 z-0 hidden w-full max-w-4xl -translate-x-1/2 max-lg:block max-lg:px-4"
+          style={{ height: weaveGeom.H }}
           aria-hidden
         >
           <svg
             width="100%"
-            height={lineHeight}
-            viewBox={`0 0 100 ${lineHeight}`}
+            height={weaveGeom.H}
+            viewBox={`0 0 100 ${weaveGeom.H}`}
             preserveAspectRatio="none"
-            className="absolute inset-x-0 top-0 h-full w-full overflow-visible lg:hidden"
+            className="absolute inset-x-0 top-0 h-full w-full overflow-visible"
           >
             <path
               ref={weaveRef}
-              d={weaveD}
+              d={weaveGeom.d}
               fill="none"
               stroke="var(--teal)"
               strokeWidth="1.15"
@@ -159,7 +254,15 @@ export default function ExperienceSection() {
               vectorEffect="non-scaling-stroke"
             />
           </svg>
-          <div className="absolute left-1/2 top-0 hidden h-full -translate-x-1/2 lg:block">
+        </div>
+
+        {/* Desktop: simple vertical line */}
+        <div
+          className="pointer-events-none absolute left-1/2 top-0 z-0 hidden w-full max-w-4xl -translate-x-1/2 lg:block"
+          style={{ height: lineHeight }}
+          aria-hidden
+        >
+          <div className="absolute left-1/2 top-0 h-full -translate-x-1/2">
             <svg width="2" height={lineHeight} className="overflow-visible">
               <line
                 ref={lineRef}
@@ -173,14 +276,18 @@ export default function ExperienceSection() {
         </div>
 
         {/* Experience entries */}
-        <div className="relative z-[1]" style={{ minHeight: lineHeight }}>
+        <div
+          ref={entriesRef}
+          className="relative z-[1] max-lg:pb-8"
+          style={{ minHeight: entriesMinHeight }}
+        >
           {experiences.map((exp, i) => {
             const isLeft = i % 2 === 0;
 
             return (
               <div
                 key={`${exp.company}-${i}`}
-                className="relative mb-[60px] flex flex-col items-center max-lg:gap-2 lg:flex-row lg:items-start"
+                className="exp-timeline-row relative mb-[60px] flex flex-col items-center max-lg:gap-2 lg:flex-row lg:items-start"
               >
                 {/* Year marker — above panel on mobile, on rail at lg */}
                 <div
