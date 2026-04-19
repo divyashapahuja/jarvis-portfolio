@@ -76,6 +76,27 @@ export default function HeroScannerSection() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       const lgUp = window.matchMedia("(min-width: 1024px)").matches;
+
+      // Mobile fallback: keep the scanner scene stable and visible instead of
+      // driving a long scrubbed timeline that can land in inconsistent states.
+      if (!lgUp) {
+        gsap.set(heroContent.current, { opacity: 0, y: -30 });
+        gsap.set(deskWrap.current, { opacity: 0 });
+        gsap.set(scannerWrap.current, { opacity: 1 });
+        gsap.set(scannerColumnRef.current, { opacity: 1 });
+        gsap.set(flash.current, { opacity: 0 });
+        gsap.set(scanLine.current, { top: "68%" });
+        gsap.set(counter.current, { textContent: "68" });
+        if (circleProgress.current) {
+          gsap.set(circleProgress.current, {
+            strokeDashoffset: CIRCUMFERENCE * 0.32,
+          });
+        }
+        const bioRefsMobile = [nameEl.current, locEl.current, skillsEl.current, aboutEl.current].filter(Boolean);
+        if (bioRefsMobile.length) gsap.set(bioRefsMobile, { opacity: 1, x: 0 });
+        return;
+      }
+
       const pinEnd = lgUp ? "+=200%" : "+=180%";
 
       const tl = gsap.timeline({
