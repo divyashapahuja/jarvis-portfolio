@@ -17,30 +17,26 @@ export default function SmoothScroll({
   const rafCb = useRef<((time: number) => void) | null>(null);
 
   useEffect(() => {
-    let isTouchDevice = false;
+    let coarse = false;
     try {
-      isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+      coarse = window.matchMedia("(pointer: coarse)").matches;
     } catch {
-      isTouchDevice = true;
+      coarse = true;
     }
-    if (isTouchDevice) {
+
+    if (coarse) {
       try {
-        // Reduces pin/layout thrash when the mobile browser chrome resizes the viewport.
         ScrollTrigger.config({ ignoreMobileResize: true });
       } catch {
         /* ignore */
       }
-      requestAnimationFrame(() => {
-        ScrollTrigger.refresh();
-      });
-      return;
     }
 
     const lenis = new Lenis({
-      lerp: 0.09,
+      lerp: coarse ? 0.14 : 0.09,
       smoothWheel: true,
-      // Let wheel events reach nested overflow:auto regions (hero scanner, modals, etc.)
       allowNestedScroll: true,
+      ...(coarse ? { syncTouch: true, syncTouchLerp: 0.12, touchMultiplier: 0.85 } : {}),
     });
 
     lenis.on("scroll", ScrollTrigger.update);

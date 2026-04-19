@@ -192,8 +192,6 @@ export default function ExperienceSection() {
   const stDebounceRef = useRef<number | null>(null);
   useEffect(() => {
     if (typeof window === "undefined") return;
-    // Global ST refresh on mobile fights the pinned hero and can freeze the tab; desktop only.
-    if (!window.matchMedia("(min-width: 1024px)").matches) return;
     if (stDebounceRef.current) clearTimeout(stDebounceRef.current);
     stDebounceRef.current = window.setTimeout(() => {
       stDebounceRef.current = null;
@@ -204,7 +202,7 @@ export default function ExperienceSection() {
           /* ignore */
         }
       });
-    }, 280);
+    }, 400);
     return () => {
       if (stDebounceRef.current) clearTimeout(stDebounceRef.current);
     };

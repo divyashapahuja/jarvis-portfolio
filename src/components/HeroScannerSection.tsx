@@ -74,16 +74,11 @@ export default function HeroScannerSection() {
   const aboutEl = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let ctx: gsap.Context | null = null;
-    let cancelled = false;
-    let raf2: number | null = null;
-
-    const run = () => {
-      if (cancelled) return;
-      ctx = gsap.context(() => {
+    const ctx = gsap.context(() => {
       const lgUp = window.matchMedia("(min-width: 1024px)").matches;
 
-      // Mobile: short pinned scroll-driven transition (hero -> scanner) so it stays in-view.
+      // Mobile: same scrubbed hero→scanner beats, but **no pin** — pin + compositor is what kills
+      // many Android Chrome tabs; Lenis `syncTouch` supplies smoothness instead.
       if (!lgUp) {
         gsap.set(heroContent.current, { opacity: 1, y: 0 });
         gsap.set(deskWrap.current, { opacity: 1 });
@@ -100,13 +95,9 @@ export default function HeroScannerSection() {
           scrollTrigger: {
             trigger: section.current,
             start: "top top",
-            // ~25% more scroll than prior mobile pin so scan + folder beats read clearly.
             end: "+=132%",
-            pin: true,
-            // `transform` pinning avoids many Android Chrome compositor crashes vs `fixed`.
-            pinType: "transform",
-            scrub: 0.72,
-            anticipatePin: 0,
+            pin: false,
+            scrub: 0.65,
           },
         });
 
@@ -166,10 +157,7 @@ export default function HeroScannerSection() {
           });
         }
 
-        // Fade the scanner column out once scatter completes
-        if (scannerColumnRef.current) {
-          mobileTl.to(scannerColumnRef.current, { opacity: 0, duration: 0.06, ease: "none" }, t + 0.12);
-        }
+        // Keep scanner column visible after scatter (no pin — avoids “vanished” end state).
 
         return;
       }
@@ -281,18 +269,8 @@ export default function HeroScannerSection() {
         tl.to(scanCol, { opacity: 0, duration: 0.08, ease: "none" }, 0.92);
       }
     }, section);
-    };
 
-    const raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(run);
-    });
-
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(raf1);
-      if (raf2 !== null) cancelAnimationFrame(raf2);
-      ctx?.revert();
-    };
+    return () => ctx.revert();
   }, []);
 
   return (
