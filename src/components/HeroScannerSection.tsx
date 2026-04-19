@@ -91,7 +91,7 @@ export default function HeroScannerSection() {
       });
 
       const bioRefs = [nameEl.current, locEl.current, skillsEl.current, aboutEl.current].filter(Boolean);
-      if (bioRefs.length) gsap.set(bioRefs, { opacity: 0 });
+      if (bioRefs.length) gsap.set(bioRefs, { opacity: lgUp ? 0 : 1, x: 0 });
 
       // Hero text fades out
       tl.to(heroContent.current, { opacity: 0, y: -30, duration: 0.08 }, 0.04);
@@ -122,15 +122,17 @@ export default function HeroScannerSection() {
         );
       }
 
-      // Bio reveals (guard refs so a missing node cannot break the whole timeline)
-      const revealBio = (el: HTMLDivElement | null, fromX: number, at: number) => {
-        if (!el) return;
-        tl.fromTo(el, { opacity: 0, x: fromX }, { opacity: 1, x: 0, duration: 0.04 }, at);
-      };
-      revealBio(nameEl.current, -30, 0.355);
-      revealBio(locEl.current, 30, 0.48);
-      revealBio(skillsEl.current, -30, 0.605);
-      revealBio(aboutEl.current, 30, 0.705);
+      // Bio reveals (desktop). On mobile we keep cards visible to avoid vanishing content.
+      if (lgUp) {
+        const revealBio = (el: HTMLDivElement | null, fromX: number, at: number) => {
+          if (!el) return;
+          tl.fromTo(el, { opacity: 0, x: fromX }, { opacity: 1, x: 0, duration: 0.04 }, at);
+        };
+        revealBio(nameEl.current, -30, 0.355);
+        revealBio(locEl.current, 30, 0.48);
+        revealBio(skillsEl.current, -30, 0.605);
+        revealBio(aboutEl.current, 30, 0.705);
+      }
 
       // Scan complete flash
       const sc = scanComplete.current;
@@ -177,7 +179,7 @@ export default function HeroScannerSection() {
 
       // Fade scanner column only (image + HUD); bio cards stay visible for stacked/mobile layout
       const scanCol = scannerColumnRef.current;
-      if (scanCol) {
+      if (scanCol && lgUp) {
         tl.to(scanCol, { opacity: 0, duration: 0.08, ease: "none" }, 0.92);
       }
     }, section);
@@ -274,7 +276,7 @@ export default function HeroScannerSection() {
             </div>
 
             {/* Circular scan gauge */}
-            <div className="absolute bottom-[-100px] left-1/2 -translate-x-1/2 sm:bottom-[-120px]">
+            <div className="absolute bottom-[-84px] left-1/2 -translate-x-1/2 sm:bottom-[-120px]">
               <div className="relative" style={{ width: 90, height: 90 }}>
                 <svg width="90" height="90" viewBox="0 0 90 90" className="absolute inset-0">
                   <circle cx="45" cy="45" r={CIRCLE_R + 8} stroke="rgba(0,212,200,0.06)" strokeWidth="1" fill="none" />

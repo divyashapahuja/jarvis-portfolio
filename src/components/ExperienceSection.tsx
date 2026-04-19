@@ -108,7 +108,7 @@ export default function ExperienceSection() {
       <div className="relative mx-auto max-w-4xl px-4 sm:px-6">
         {/* Vertical line — left rail on mobile, centered on lg */}
         <div
-          className="absolute left-4 top-0 lg:left-1/2 lg:-translate-x-1/2"
+          className="absolute left-[17px] top-0 lg:left-1/2 lg:-translate-x-1/2"
           style={{ height: lineHeight }}
         >
           <svg width="2" height={lineHeight} className="overflow-visible">
@@ -135,7 +135,7 @@ export default function ExperienceSection() {
               >
                 {/* Year marker */}
                 <div
-                  className="year-marker absolute left-4 z-10 flex -translate-x-1/2 flex-col items-center lg:left-1/2"
+                  className="year-marker absolute left-[17px] z-10 flex -translate-x-1/2 flex-col items-center lg:left-1/2"
                   style={{ top: "8px" }}
                 >
                   <div
