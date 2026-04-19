@@ -77,23 +77,46 @@ export default function HeroScannerSection() {
     const ctx = gsap.context(() => {
       const lgUp = window.matchMedia("(min-width: 1024px)").matches;
 
-      // Mobile fallback: keep the scanner scene stable and visible instead of
-      // driving a long scrubbed timeline that can land in inconsistent states.
+      // Mobile fallback: keep hero-first flow, but avoid pinning/scrub complexity.
       if (!lgUp) {
-        gsap.set(heroContent.current, { opacity: 0, y: -30 });
-        gsap.set(deskWrap.current, { opacity: 0 });
-        gsap.set(scannerWrap.current, { opacity: 1 });
+        gsap.set(heroContent.current, { opacity: 1, y: 0 });
+        gsap.set(deskWrap.current, { opacity: 1 });
+        gsap.set(scannerWrap.current, { opacity: 0 });
         gsap.set(scannerColumnRef.current, { opacity: 1 });
         gsap.set(flash.current, { opacity: 0 });
-        gsap.set(scanLine.current, { top: "68%" });
-        gsap.set(counter.current, { textContent: "68" });
+        gsap.set(scanLine.current, { top: "100%" });
+        gsap.set(counter.current, { textContent: "0" });
         if (circleProgress.current) {
-          gsap.set(circleProgress.current, {
-            strokeDashoffset: CIRCUMFERENCE * 0.32,
-          });
+          gsap.set(circleProgress.current, { strokeDashoffset: CIRCUMFERENCE });
         }
         const bioRefsMobile = [nameEl.current, locEl.current, skillsEl.current, aboutEl.current].filter(Boolean);
-        if (bioRefsMobile.length) gsap.set(bioRefsMobile, { opacity: 1, x: 0 });
+        if (bioRefsMobile.length) gsap.set(bioRefsMobile, { opacity: 0, x: 0 });
+
+        const mobileTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section.current,
+            start: "top top",
+            end: "+=120%",
+            scrub: 0.6,
+          },
+        });
+
+        mobileTl.to(heroContent.current, { opacity: 0, y: -24, duration: 0.20 }, 0.05);
+        mobileTl.to(deskWrap.current, { opacity: 0, duration: 0.22 }, 0.18);
+        mobileTl.to(scannerWrap.current, { opacity: 1, duration: 0.20 }, 0.22);
+        mobileTl.fromTo(scanLine.current, { top: "100%" }, { top: "26%", duration: 0.50, ease: "none" }, 0.34);
+        mobileTl.fromTo(counter.current, { textContent: "0" }, { textContent: "74", snap: { textContent: 1 }, duration: 0.50, ease: "none" }, 0.34);
+        if (circleProgress.current) {
+          mobileTl.fromTo(
+            circleProgress.current,
+            { strokeDashoffset: CIRCUMFERENCE },
+            { strokeDashoffset: CIRCUMFERENCE * 0.26, duration: 0.50, ease: "none" },
+            0.34,
+          );
+        }
+        if (bioRefsMobile.length) {
+          mobileTl.to(bioRefsMobile, { opacity: 1, duration: 0.22, stagger: 0.06 }, 0.62);
+        }
         return;
       }
 
