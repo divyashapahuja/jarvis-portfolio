@@ -134,7 +134,33 @@ export default function HeroScannerSection() {
         }
         if (aboutEl.current) {
           mobileTl.to(aboutEl.current, { opacity: 1, x: 0, duration: revealDur }, t);
+          t += step;
         }
+
+        // Skills scatter on mobile — fan out toward three panel positions then fade
+        const mobileSpread = Math.max(80, Math.floor(window.innerWidth * 0.28));
+        const mobilePanelOffsets = [
+          { dx: -mobileSpread, dy: 40 },
+          { dx: 0, dy: 55 },
+          { dx: mobileSpread, dy: 40 },
+        ];
+        const mobileTags = section.current?.querySelectorAll(".skill-tag");
+        if (mobileTags) {
+          mobileTags.forEach((tag, idx) => {
+            const target = mobilePanelOffsets[idx % mobilePanelOffsets.length];
+            mobileTl.to(
+              tag,
+              { x: target.dx, y: target.dy, opacity: 0, scale: 0.2, duration: 0.08, ease: "power2.in" },
+              t + idx * 0.003,
+            );
+          });
+        }
+
+        // Fade the scanner column out once scatter completes
+        if (scannerColumnRef.current) {
+          mobileTl.to(scannerColumnRef.current, { opacity: 0, duration: 0.06, ease: "none" }, t + 0.12);
+        }
+
         return;
       }
 
@@ -295,15 +321,14 @@ export default function HeroScannerSection() {
       <div
         ref={scannerWrap}
         id="scanner"
-        className="pointer-events-none absolute inset-0 z-20 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-y-auto overflow-x-hidden opacity-0 xl:overflow-x-visible xl:overflow-y-visible"
+        className="pointer-events-none absolute inset-0 z-20 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-y-auto overflow-x-hidden opacity-0 max-lg:items-start max-lg:justify-start xl:overflow-x-visible xl:overflow-y-visible"
       >
-        <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-20 pt-2 sm:px-4 sm:pb-24 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:pt-0 xl:px-0">
+        <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-4 pt-1 sm:px-4 sm:pb-8 max-lg:pt-[env(safe-area-inset-top,12px)] xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:pt-0 xl:px-0">
           <div
             ref={scannerColumnRef}
-            className="relative w-full max-w-[380px] shrink-0 max-xl:pb-40 sm:max-xl:pb-44 xl:absolute xl:left-1/2 xl:top-1/2 xl:max-w-none xl:w-auto xl:-translate-x-1/2 xl:-translate-y-1/2 xl:pb-0"
-            style={{ marginTop: "12px" }}
+            className="relative w-full max-w-[380px] shrink-0 max-lg:mt-2 lg:pb-40 xl:absolute xl:left-1/2 xl:top-1/2 xl:max-w-none xl:w-auto xl:-translate-x-1/2 xl:-translate-y-1/2 xl:pb-0 xl:mt-0"
           >
-            <div className="relative w-full max-lg:mt-8 max-lg:translate-y-4">
+            <div className="relative w-full max-lg:max-w-[260px] max-lg:mx-auto">
               <Image
                 src="/scanner.png"
                 alt="Character being scanned"
@@ -340,7 +365,7 @@ export default function HeroScannerSection() {
             </div>
 
             {/* Circular scan gauge */}
-            <div className="absolute bottom-[-84px] left-1/2 -translate-x-1/2 max-lg:relative max-lg:bottom-auto max-lg:mt-8 sm:bottom-[-120px]">
+            <div className="absolute bottom-[-84px] left-1/2 -translate-x-1/2 sm:bottom-[-120px] max-lg:static max-lg:mt-3 max-lg:w-full max-lg:flex max-lg:justify-center max-lg:translate-x-0">
               <div className="relative" style={{ width: 90, height: 90 }}>
                 <svg width="90" height="90" viewBox="0 0 90 90" className="absolute inset-0">
                   <circle cx="45" cy="45" r={CIRCLE_R + 8} stroke="rgba(0,212,200,0.06)" strokeWidth="1" fill="none" />
@@ -384,25 +409,25 @@ export default function HeroScannerSection() {
           </div>
 
           {/* Bio cards — column below ~1280px; orbit HUD only on xl+ (avoids clipping inside overflow-hidden hero) */}
-          <div className="relative z-30 mt-8 flex w-full max-w-md flex-col gap-3 max-lg:mt-10 max-lg:pb-6 sm:max-w-lg max-xl:mt-10 xl:absolute xl:inset-0 xl:mt-0 xl:max-w-none xl:min-h-0 xl:pointer-events-none">
+          <div className="relative z-30 flex flex-col gap-3 w-full max-w-md mt-8 max-lg:grid max-lg:grid-cols-2 max-lg:gap-2 max-lg:mt-3 max-lg:pb-2 sm:max-w-lg max-xl:mt-8 xl:absolute xl:inset-0 xl:mt-0 xl:max-w-none xl:min-h-0 xl:pointer-events-none">
             {/* xl+: anchor HUD to viewport center so cards stay in-frame on laptops (old negative left/right sat off-screen) */}
             <div className="w-full xl:pointer-events-auto xl:absolute xl:bottom-[12%] xl:left-[max(0.75rem,calc(50%-31rem))] xl:w-auto xl:max-w-[min(16rem,42vw)]">
               <BioCard label="Name" side="left" innerRef={nameEl}>
-                <p className="text-white" style={{ fontFamily: "Orbitron, sans-serif", fontSize: "1.2rem" }}>{BIO.name}</p>
+                <p className="text-white max-lg:text-sm" style={{ fontFamily: "Orbitron, sans-serif", fontSize: "1.2rem" }}>{BIO.name}</p>
               </BioCard>
             </div>
 
             <div className="w-full xl:pointer-events-auto xl:absolute xl:bottom-[34%] xl:right-[max(0.75rem,calc(50%-31rem))] xl:w-auto xl:max-w-[min(16rem,42vw)]">
               <BioCard label="Location" side="right" innerRef={locEl}>
-                <p className="text-white" style={{ fontFamily: "Orbitron, sans-serif", fontSize: "1.2rem" }}>{BIO.location}</p>
+                <p className="text-white max-lg:text-sm" style={{ fontFamily: "Orbitron, sans-serif", fontSize: "1.2rem" }}>{BIO.location}</p>
               </BioCard>
             </div>
 
             <div className="w-full xl:pointer-events-auto xl:absolute xl:bottom-[52%] xl:left-[max(0.75rem,calc(50%-33rem))] xl:w-auto xl:max-w-[min(18rem,44vw)]">
               <BioCard label="Skills" side="left" innerRef={skillsEl}>
-                <div className="flex max-w-[220px] flex-wrap gap-1.5 sm:max-w-[240px] lg:max-w-[200px] xl:max-w-none">
+                <div className="flex flex-wrap gap-1 sm:max-w-[240px] lg:max-w-[200px] xl:max-w-none">
                   {BIO.skills.map((s) => (
-                    <span key={s} className="skill-tag rounded border border-neon/20 bg-neon/5 px-2 py-0.5 text-[11px] text-neon/80" style={{ fontFamily: "IBM Plex Mono, monospace" }}>{s}</span>
+                    <span key={s} className="skill-tag rounded border border-neon/20 bg-neon/5 px-1.5 py-0.5 text-[10px] text-neon/80" style={{ fontFamily: "IBM Plex Mono, monospace" }}>{s}</span>
                   ))}
                 </div>
               </BioCard>
@@ -410,7 +435,7 @@ export default function HeroScannerSection() {
 
             <div className="w-full xl:pointer-events-auto xl:absolute xl:bottom-[70%] xl:right-[max(0.75rem,calc(50%-33rem))] xl:w-auto xl:max-w-[min(18rem,44vw)]">
               <BioCard label="About" side="right" innerRef={aboutEl}>
-                <p className="max-w-[220px] leading-relaxed text-white/80 sm:max-w-[260px] lg:max-w-[200px] xl:max-w-none" style={{ fontFamily: "Orbitron, sans-serif", fontSize: "1rem" }}>{BIO.about}</p>
+                <p className="leading-relaxed text-white/80 max-lg:text-[0.75rem] sm:max-w-[260px] lg:max-w-[200px] xl:max-w-none" style={{ fontFamily: "Orbitron, sans-serif", fontSize: "1rem" }}>{BIO.about}</p>
               </BioCard>
             </div>
           </div>
