@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import type { CSSProperties } from "react";
-import { portfolioProfile } from "@/lib/projects";
 
 interface Message {
   role: "user" | "assistant";
@@ -190,7 +189,7 @@ export default function ChatBot() {
                 className="text-center text-white/25 text-xs mt-16 px-4"
                 style={{ fontFamily: "IBM Plex Mono, monospace" }}
               >
-                {`Ask me anything about ${portfolioProfile.name}'s portfolio`}
+                Ask me anything about Jane&apos;s portfolio
               </p>
             )}
             {messages.map((msg, i) => (

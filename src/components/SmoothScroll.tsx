@@ -17,18 +17,6 @@ export default function SmoothScroll({
   const rafCb = useRef<((time: number) => void) | null>(null);
 
   useEffect(() => {
-    // Lenis can interfere with native touch scrolling on some mobile browsers.
-    // On coarse pointers (phones/tablets), prefer native scrolling.
-    const isCoarsePointer =
-      typeof window !== "undefined" &&
-      window.matchMedia?.("(pointer: coarse)").matches;
-    if (isCoarsePointer) {
-      requestAnimationFrame(() => {
-        ScrollTrigger.refresh();
-      });
-      return;
-    }
-
     const lenis = new Lenis({
       lerp: 0.09,
       smoothWheel: true,

@@ -1,7 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest } from "next/server";
 import {
-  portfolioProfile,
   experiences,
   educations,
   getProfessionalTenureSummary,
@@ -9,16 +8,13 @@ import {
   formatCurrentDateForChat,
   formatProfileForChat,
   formatContactLinksForChat,
-  formatHighestDegreeForChat,
-  formatPublicationsForChat,
 } from "@/lib/projects";
 
 /** Node runtime: Gemini SDK expects a full Node environment on Vercel. */
 export const runtime = "nodejs";
 
 function buildSystemPrompt(asOf = new Date()) {
-  const owner = portfolioProfile.name;
-  return `You are ${owner}'s portfolio assistant. Answer ONLY from the portfolio information below—do not invent employers, dates, degrees, or metrics. If something is not listed, say you do not see it in this portfolio. Be concise, friendly, and helpful. Keep answers under 3 sentences unless asked for details.
+  return `You are Jane Doe's portfolio assistant. Answer ONLY from the portfolio information below—do not invent employers, dates, degrees, or metrics. If something is not listed, say you do not see it in her portfolio. Be concise, friendly, and helpful. Keep answers under 3 sentences unless asked for details.
 
 — Reference date / “today” (server clock, typically UTC on Vercel):
 ${formatCurrentDateForChat(asOf)}
@@ -34,22 +30,19 @@ ${experiences.map((e) => `- ${e.company} — ${e.role} (${e.period}): ${e.descri
 
 ${getProfessionalTenureSummary(asOf)}
 
-— Education (degrees, schools, GPA):
+— Education (degrees, schools, GPA; highest degree is the B.S. below):
 ${educations
   .map(
     (ed) =>
       `- ${ed.school}: ${ed.degree} — ${ed.field} (${ed.period})${ed.gpa != null ? `; GPA ${ed.gpa}` : ""}. Highlights: ${ed.highlights.join("; ")}.`,
   )
   .join("\n")}
-${formatHighestDegreeForChat()}
-
-— Publications (titles and venues as on the site):
-${formatPublicationsForChat()}
+Highest degree: B.S. Computer Science from State University (2019–2023). She also holds an A.S. in Mathematics & Sciences from City College (2017–2019).
 
 — Contact links (use these exact labels and URLs):
 ${formatContactLinksForChat()}
 
-If asked something not related to ${owner}'s profile, politely redirect the conversation back to the portfolio.`;
+If asked something not related to Jane's profile, politely redirect the conversation back to the portfolio.`;
 }
 
 export async function POST(request: NextRequest) {
@@ -77,14 +70,7 @@ export async function POST(request: NextRequest) {
     const chat = model.startChat({
       history: [
         { role: "user", parts: [{ text: systemPrompt }] },
-        {
-          role: "model",
-          parts: [
-            {
-              text: `Understood! I'm ${portfolioProfile.name}'s portfolio assistant. How can I help you learn more about this portfolio?`,
-            },
-          ],
-        },
+        { role: "model", parts: [{ text: "Understood! I'm Jane's portfolio assistant. How can I help you learn more about her work and experience?" }] },
         ...messages.slice(0, -1).map((m: { role: string; content: string }) => ({
           role: m.role === "user" ? "user" : "model",
           parts: [{ text: m.content }],

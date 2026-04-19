@@ -3,16 +3,10 @@ import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import ChatBot from "@/components/ChatBot";
 import { CustomCursor } from "@/components/ClientOnly";
-import { portfolioProfile } from "@/lib/projects";
-
-const metaDescription =
-  portfolioProfile.about.length > 155
-    ? `${portfolioProfile.about.slice(0, 152).trimEnd()}…`
-    : portfolioProfile.about;
 
 export const metadata: Metadata = {
-  title: `${portfolioProfile.name} — Portfolio`,
-  description: metaDescription,
+  title: "Jane Doe — Portfolio",
+  description: "Scroll-driven animated portfolio",
 };
 
 export const viewport: Viewport = {
