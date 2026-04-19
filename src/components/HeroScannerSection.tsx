@@ -98,21 +98,24 @@ export default function HeroScannerSection() {
             end: "+=132%",
             pin: true,
             pinType: "fixed",
-            scrub: 0.55,
+            scrub: 0.72,
             anticipatePin: 1,
           },
         });
 
-        mobileTl.to(heroContent.current, { opacity: 0, y: -24, duration: 0.16 }, 0.05);
-        mobileTl.to(deskWrap.current, { opacity: 0, duration: 0.18 }, 0.14);
-        mobileTl.to(scannerWrap.current, { opacity: 1, duration: 0.18 }, 0.16);
-        mobileTl.fromTo(scanLine.current, { top: "100%" }, { top: "0%", duration: 0.58, ease: "none" }, 0.26);
-        mobileTl.fromTo(counter.current, { textContent: "0" }, { textContent: "100", snap: { textContent: 1 }, duration: 0.58, ease: "none" }, 0.26);
+        // Crossfade hero → scanner (opacity only — no layout offset).
+        mobileTl.to(heroContent.current, { opacity: 0, duration: 0.26, ease: "power2.inOut" }, 0.05);
+        mobileTl.to(deskWrap.current, { opacity: 0, duration: 0.28, ease: "power2.inOut" }, "<0.06");
+        mobileTl.to(scannerWrap.current, { opacity: 1, duration: 0.32, ease: "power2.out" }, "<0.14");
+        mobileTl.to(flash.current, { opacity: 0.14, duration: 0.08, ease: "sine.out" }, 0.18);
+        mobileTl.to(flash.current, { opacity: 0, duration: 0.16, ease: "sine.in" }, 0.24);
+        mobileTl.fromTo(scanLine.current, { top: "100%" }, { top: "0%", duration: 0.58, ease: "power1.inOut" }, 0.26);
+        mobileTl.fromTo(counter.current, { textContent: "0" }, { textContent: "100", snap: { textContent: 1 }, duration: 0.58, ease: "power1.inOut" }, 0.26);
         if (circleProgress.current) {
           mobileTl.fromTo(
             circleProgress.current,
             { strokeDashoffset: CIRCUMFERENCE },
-            { strokeDashoffset: 0, duration: 0.58, ease: "none" },
+            { strokeDashoffset: 0, duration: 0.58, ease: "power1.inOut" },
             0.26,
           );
         }
@@ -121,19 +124,19 @@ export default function HeroScannerSection() {
         const step = 0.14;
         let t = 0.26;
         if (nameEl.current) {
-          mobileTl.to(nameEl.current, { opacity: 1, x: 0, duration: revealDur }, t);
+          mobileTl.to(nameEl.current, { opacity: 1, x: 0, duration: revealDur, ease: "power2.out" }, t);
           t += step;
         }
         if (locEl.current) {
-          mobileTl.to(locEl.current, { opacity: 1, x: 0, duration: revealDur }, t);
+          mobileTl.to(locEl.current, { opacity: 1, x: 0, duration: revealDur, ease: "power2.out" }, t);
           t += step;
         }
         if (skillsEl.current) {
-          mobileTl.to(skillsEl.current, { opacity: 1, x: 0, duration: revealDur }, t);
+          mobileTl.to(skillsEl.current, { opacity: 1, x: 0, duration: revealDur, ease: "power2.out" }, t);
           t += step;
         }
         if (aboutEl.current) {
-          mobileTl.to(aboutEl.current, { opacity: 1, x: 0, duration: revealDur }, t);
+          mobileTl.to(aboutEl.current, { opacity: 1, x: 0, duration: revealDur, ease: "power2.out" }, t);
           t += step;
         }
 
@@ -181,10 +184,10 @@ export default function HeroScannerSection() {
       const bioRefs = [nameEl.current, locEl.current, skillsEl.current, aboutEl.current].filter(Boolean);
       if (bioRefs.length) gsap.set(bioRefs, { opacity: lgUp ? 0 : 1, x: 0 });
 
-      // Hero text fades out
-      tl.to(heroContent.current, { opacity: 0, y: -30, duration: 0.08 }, 0.04);
+      // Hero text fades out (gentle — no vertical offset).
+      tl.to(heroContent.current, { opacity: 0, duration: 0.12, ease: "power2.inOut" }, 0.04);
       // Desk slowly zooms
-      tl.to(deskScale.current, { scale: 1.25, ease: "none", duration: 0.18 }, 0);
+      tl.to(deskScale.current, { scale: 1.25, ease: "power1.out", duration: 0.18 }, 0);
 
       // Glitch effect
       tl.to(deskScale.current, { x: -6, filter: "hue-rotate(90deg) brightness(1.5)", duration: 0.012 }, 0.18)
@@ -193,19 +196,19 @@ export default function HeroScannerSection() {
         .to(deskScale.current, { x: 0, y: 0, filter: "none", duration: 0.008 });
 
       // Flash + crossfade
-      tl.to(flash.current, { opacity: 0.6, duration: 0.02 }, 0.20);
-      tl.to(flash.current, { opacity: 0, duration: 0.04 }, 0.23);
-      tl.to(deskWrap.current, { opacity: 0, duration: 0.04 }, 0.20);
-      tl.to(scannerWrap.current, { opacity: 1, duration: 0.06 }, 0.22);
+      tl.to(flash.current, { opacity: 0.38, duration: 0.05, ease: "sine.out" }, 0.20);
+      tl.to(flash.current, { opacity: 0, duration: 0.1, ease: "sine.in" }, 0.24);
+      tl.to(deskWrap.current, { opacity: 0, duration: 0.1, ease: "power2.inOut" }, 0.20);
+      tl.to(scannerWrap.current, { opacity: 1, duration: 0.12, ease: "power2.out" }, 0.22);
 
       // Scanner scan line sweeps upward
-      tl.fromTo(scanLine.current, { top: "100%" }, { top: "0%", ease: "none", duration: 0.50 }, 0.28);
-      tl.fromTo(counter.current, { textContent: "0" }, { textContent: "100", snap: { textContent: 1 }, ease: "none", duration: 0.50 }, 0.28);
+      tl.fromTo(scanLine.current, { top: "100%" }, { top: "0%", ease: "power1.inOut", duration: 0.50 }, 0.28);
+      tl.fromTo(counter.current, { textContent: "0" }, { textContent: "100", snap: { textContent: 1 }, ease: "power1.inOut", duration: 0.50 }, 0.28);
 
       if (circleProgress.current) {
         tl.fromTo(circleProgress.current,
           { strokeDashoffset: CIRCUMFERENCE },
-          { strokeDashoffset: 0, ease: "none", duration: 0.50 },
+          { strokeDashoffset: 0, ease: "power1.inOut", duration: 0.50 },
           0.28
         );
       }
@@ -214,7 +217,7 @@ export default function HeroScannerSection() {
       if (lgUp) {
         const revealBio = (el: HTMLDivElement | null, fromX: number, at: number) => {
           if (!el) return;
-          tl.fromTo(el, { opacity: 0, x: fromX }, { opacity: 1, x: 0, duration: 0.04 }, at);
+          tl.fromTo(el, { opacity: 0, x: fromX }, { opacity: 1, x: 0, duration: 0.06, ease: "power2.out" }, at);
         };
         revealBio(nameEl.current, -30, 0.355);
         revealBio(locEl.current, 30, 0.48);
