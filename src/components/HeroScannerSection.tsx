@@ -119,7 +119,7 @@ export default function HeroScannerSection() {
         // Each folder gets its own beat (~25% more scroll vs one short stagger block).
         const revealDur = 0.12;
         const step = 0.14;
-        let t = 0.62;
+        let t = 0.26;
         if (nameEl.current) {
           mobileTl.to(nameEl.current, { opacity: 1, x: 0, duration: revealDur }, t);
           t += step;
@@ -326,7 +326,7 @@ export default function HeroScannerSection() {
         <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-4 pt-1 sm:px-4 sm:pb-8 max-lg:pt-[env(safe-area-inset-top,12px)] xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:pt-0 xl:px-0">
           <div
             ref={scannerColumnRef}
-            className="relative w-full max-w-[380px] shrink-0 max-lg:mt-12 lg:pb-40 xl:absolute xl:left-1/2 xl:top-1/2 xl:max-w-none xl:w-auto xl:-translate-x-1/2 xl:-translate-y-1/2 xl:pb-0 xl:mt-0"
+            className="relative w-full max-w-[380px] shrink-0 max-lg:mt-16 lg:pb-40 xl:absolute xl:left-1/2 xl:top-1/2 xl:max-w-none xl:w-auto xl:-translate-x-1/2 xl:-translate-y-1/2 xl:pb-0 xl:mt-0"
           >
             <div className="relative w-full max-lg:max-w-[260px] max-lg:mx-auto">
               <Image
