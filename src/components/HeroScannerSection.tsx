@@ -74,7 +74,13 @@ export default function HeroScannerSection() {
   const aboutEl = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
+    let ctx: gsap.Context | null = null;
+    let cancelled = false;
+    let raf2: number | null = null;
+
+    const run = () => {
+      if (cancelled) return;
+      ctx = gsap.context(() => {
       const lgUp = window.matchMedia("(min-width: 1024px)").matches;
 
       // Mobile: short pinned scroll-driven transition (hero -> scanner) so it stays in-view.
@@ -97,9 +103,10 @@ export default function HeroScannerSection() {
             // ~25% more scroll than prior mobile pin so scan + folder beats read clearly.
             end: "+=132%",
             pin: true,
-            pinType: "fixed",
+            // `transform` pinning avoids many Android Chrome compositor crashes vs `fixed`.
+            pinType: "transform",
             scrub: 0.72,
-            anticipatePin: 1,
+            anticipatePin: 0,
           },
         });
 
@@ -274,15 +281,25 @@ export default function HeroScannerSection() {
         tl.to(scanCol, { opacity: 0, duration: 0.08, ease: "none" }, 0.92);
       }
     }, section);
+    };
 
-    return () => ctx.revert();
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(run);
+    });
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf1);
+      if (raf2 !== null) cancelAnimationFrame(raf2);
+      ctx?.revert();
+    };
   }, []);
 
   return (
     <section
       ref={section}
       id="hero"
-      className="relative h-[100svh] w-full max-w-full overflow-x-hidden max-lg:overflow-y-visible lg:overflow-y-hidden lg:h-[100dvh] lg:min-h-[100svh] xl:overflow-x-visible"
+      className="relative h-[100svh] w-full max-w-full overflow-x-hidden overflow-y-hidden lg:h-[100dvh] lg:min-h-[100svh] xl:overflow-x-visible"
       style={{ background: "var(--background)" }}
     >
       <div className="absolute inset-0 bg-grid opacity-30" />
