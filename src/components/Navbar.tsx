@@ -86,7 +86,11 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-4 sm:px-8 sm:py-5 pointer-events-none">
+      <nav className="fixed left-0 right-0 top-0 z-[80] flex items-center justify-between px-4 pb-3 pt-[max(0.9rem,env(safe-area-inset-top))] sm:px-8 sm:pb-4 sm:pt-5 pointer-events-none">
+        <div
+          className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-black/75 via-black/45 to-transparent backdrop-blur-[2px]"
+          aria-hidden
+        />
         <div className="pointer-events-auto flex flex-col gap-1.5 min-w-0">
           <a
             href="#"

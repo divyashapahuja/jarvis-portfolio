@@ -76,14 +76,14 @@ export default function HeroScannerSection() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       const lgUp = window.matchMedia("(min-width: 1024px)").matches;
-      const pinEnd = lgUp ? "+=200%" : "+=140%";
+      const pinEnd = lgUp ? "+=200%" : "+=180%";
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section.current,
           start: "top top",
           end: pinEnd,
-          pin: true,
+          pin: lgUp,
           pinType: "fixed",
           scrub: 0.5,
           anticipatePin: 1,
@@ -140,31 +140,39 @@ export default function HeroScannerSection() {
       tl.to(sc, { opacity: 0, duration: 0.008 }, 0.83);
       tl.to(sc, { opacity: 1, duration: 0.008 }, 0.84);
 
-      // Skills scatter toward project panels (desktop only — on stacked hero, keep tags readable)
-      if (lgUp) {
-        const spread = 560;
-        const panelOffsets = [
-          { dx: -spread, dy: 80 },
-          { dx: 0, dy: 80 },
-          { dx: spread, dy: 80 },
-        ];
-        const tags = section.current?.querySelectorAll(".skill-tag");
-        if (tags) {
-          tags.forEach((tag, i) => {
-            const target = panelOffsets[i % panelOffsets.length];
-            const rect = tag.getBoundingClientRect();
-            const cx = window.innerWidth / 2;
-            const cy = window.innerHeight / 2;
-            tl.to(tag, {
+      // Skills scatter toward project panels.
+      const spread = lgUp ? 560 : Math.max(120, Math.floor(window.innerWidth * 0.35));
+      const panelOffsets = lgUp
+        ? [
+            { dx: -spread, dy: 80 },
+            { dx: 0, dy: 80 },
+            { dx: spread, dy: 80 },
+          ]
+        : [
+            { dx: -spread, dy: 48 },
+            { dx: 0, dy: 56 },
+            { dx: spread, dy: 48 },
+          ];
+      const tags = section.current?.querySelectorAll(".skill-tag");
+      if (tags) {
+        tags.forEach((tag, i) => {
+          const target = panelOffsets[i % panelOffsets.length];
+          const rect = tag.getBoundingClientRect();
+          const cx = window.innerWidth / 2;
+          const cy = window.innerHeight / 2;
+          tl.to(
+            tag,
+            {
               x: cx + target.dx - rect.left - rect.width / 2,
               y: cy + target.dy - rect.top,
               opacity: 0,
               scale: 0.15,
               duration: 0.10,
               ease: "power2.in",
-            }, 0.87 + i * 0.004);
-          });
-        }
+            },
+            0.87 + i * 0.004,
+          );
+        });
       }
 
       // Fade scanner column only (image + HUD); bio cards stay visible for stacked/mobile layout
@@ -181,7 +189,7 @@ export default function HeroScannerSection() {
     <section
       ref={section}
       id="hero"
-      className="relative h-[100dvh] min-h-[100svh] w-full max-w-full overflow-x-hidden overflow-y-hidden xl:overflow-x-visible"
+      className="relative min-h-[120svh] w-full max-w-full overflow-x-hidden overflow-y-visible lg:h-[100dvh] lg:min-h-[100svh] lg:overflow-y-hidden xl:overflow-x-visible"
       style={{ background: "var(--background)" }}
     >
       <div className="absolute inset-0 bg-grid opacity-30" />
@@ -225,7 +233,7 @@ export default function HeroScannerSection() {
         id="scanner"
         className="pointer-events-none absolute inset-0 z-20 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-y-auto overflow-x-hidden opacity-0 xl:overflow-x-visible xl:overflow-y-visible"
       >
-        <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-6 sm:px-4 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:px-0">
+        <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-20 pt-2 sm:px-4 sm:pb-24 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:pt-0 xl:px-0">
           <div
             ref={scannerColumnRef}
             className="relative w-full max-w-[380px] shrink-0 max-xl:pb-32 sm:max-xl:pb-36 xl:absolute xl:left-1/2 xl:top-1/2 xl:max-w-none xl:w-auto xl:-translate-x-1/2 xl:-translate-y-1/2 xl:pb-0"
@@ -310,7 +318,7 @@ export default function HeroScannerSection() {
           </div>
 
           {/* Bio cards — column below ~1280px; orbit HUD only on xl+ (avoids clipping inside overflow-hidden hero) */}
-          <div className="relative z-30 mt-5 flex w-full max-w-md flex-col gap-3 sm:max-w-lg max-xl:mt-8 xl:absolute xl:inset-0 xl:mt-0 xl:max-w-none xl:min-h-0 xl:pointer-events-none">
+          <div className="relative z-30 mt-8 flex w-full max-w-md flex-col gap-3 sm:max-w-lg max-xl:mt-10 xl:absolute xl:inset-0 xl:mt-0 xl:max-w-none xl:min-h-0 xl:pointer-events-none">
             {/* xl+: anchor HUD to viewport center so cards stay in-frame on laptops (old negative left/right sat off-screen) */}
             <div className="w-full xl:pointer-events-auto xl:absolute xl:bottom-[12%] xl:left-[max(0.75rem,calc(50%-31rem))] xl:w-auto xl:max-w-[min(16rem,42vw)]">
               <BioCard label="Name" side="left" innerRef={nameEl}>
