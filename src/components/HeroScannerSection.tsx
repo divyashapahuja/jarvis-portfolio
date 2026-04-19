@@ -75,101 +75,15 @@ export default function HeroScannerSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const lgUp = window.matchMedia("(min-width: 1024px)").matches;
-
-      // Mobile: same scrubbed hero→scanner beats, but **no pin** — pin + compositor is what kills
-      // many Android Chrome tabs; Lenis `syncTouch` supplies smoothness instead.
-      if (!lgUp) {
-        gsap.set(heroContent.current, { opacity: 1, y: 0 });
-        gsap.set(deskWrap.current, { opacity: 1 });
-        gsap.set(scannerWrap.current, { opacity: 0 });
-        gsap.set(scannerColumnRef.current, { opacity: 1 });
-        gsap.set(flash.current, { opacity: 0 });
-        gsap.set(scanLine.current, { top: "100%" });
-        gsap.set(counter.current, { textContent: "0" });
-        if (circleProgress.current) gsap.set(circleProgress.current, { strokeDashoffset: CIRCUMFERENCE });
-        const bioRefsMobile = [nameEl.current, locEl.current, skillsEl.current, aboutEl.current].filter(Boolean);
-        if (bioRefsMobile.length) gsap.set(bioRefsMobile, { opacity: 0, x: 0 });
-
-        const mobileTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: section.current,
-            start: "top top",
-            end: "+=132%",
-            pin: false,
-            scrub: 0.65,
-          },
-        });
-
-        // Crossfade hero → scanner (opacity only — no layout offset).
-        mobileTl.to(heroContent.current, { opacity: 0, duration: 0.26, ease: "power2.inOut" }, 0.05);
-        mobileTl.to(deskWrap.current, { opacity: 0, duration: 0.28, ease: "power2.inOut" }, "<0.06");
-        mobileTl.to(scannerWrap.current, { opacity: 1, duration: 0.32, ease: "power2.out" }, "<0.14");
-        mobileTl.to(flash.current, { opacity: 0.14, duration: 0.08, ease: "sine.out" }, 0.18);
-        mobileTl.to(flash.current, { opacity: 0, duration: 0.16, ease: "sine.in" }, 0.24);
-        mobileTl.fromTo(scanLine.current, { top: "100%" }, { top: "0%", duration: 0.58, ease: "power1.inOut" }, 0.26);
-        mobileTl.fromTo(counter.current, { textContent: "0" }, { textContent: "100", snap: { textContent: 1 }, duration: 0.58, ease: "power1.inOut" }, 0.26);
-        if (circleProgress.current) {
-          mobileTl.fromTo(
-            circleProgress.current,
-            { strokeDashoffset: CIRCUMFERENCE },
-            { strokeDashoffset: 0, duration: 0.58, ease: "power1.inOut" },
-            0.26,
-          );
-        }
-        // Each folder gets its own beat (~25% more scroll vs one short stagger block).
-        const revealDur = 0.12;
-        const step = 0.10;
-        let t = 0.46;
-        if (nameEl.current) {
-          mobileTl.to(nameEl.current, { opacity: 1, x: 0, duration: revealDur, ease: "power2.out" }, t);
-          t += step;
-        }
-        if (locEl.current) {
-          mobileTl.to(locEl.current, { opacity: 1, x: 0, duration: revealDur, ease: "power2.out" }, t);
-          t += step;
-        }
-        if (skillsEl.current) {
-          mobileTl.to(skillsEl.current, { opacity: 1, x: 0, duration: revealDur, ease: "power2.out" }, t);
-          t += step;
-        }
-        if (aboutEl.current) {
-          mobileTl.to(aboutEl.current, { opacity: 1, x: 0, duration: revealDur, ease: "power2.out" }, t);
-          t += step;
-        }
-
-        // Skills scatter on mobile — fan out toward three panel positions then fade
-        const mobileSpread = Math.max(80, Math.floor(window.innerWidth * 0.28));
-        const mobilePanelOffsets = [
-          { dx: -mobileSpread, dy: 40 },
-          { dx: 0, dy: 55 },
-          { dx: mobileSpread, dy: 40 },
-        ];
-        const mobileTags = section.current?.querySelectorAll(".skill-tag");
-        if (mobileTags) {
-          mobileTags.forEach((tag, idx) => {
-            const target = mobilePanelOffsets[idx % mobilePanelOffsets.length];
-            mobileTl.to(
-              tag,
-              { x: target.dx, y: target.dy, opacity: 0, scale: 0.2, duration: 0.08, ease: "power2.in" },
-              t + idx * 0.003,
-            );
-          });
-        }
-
-        // Keep scanner column visible after scatter (no pin — avoids “vanished” end state).
-
-        return;
-      }
-
-      const pinEnd = lgUp ? "+=200%" : "+=180%";
+      // Mobile: scanner is stacked below the hero in the DOM (see JSX) — no ScrollTrigger here.
+      if (!window.matchMedia("(min-width: 1024px)").matches) return;
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section.current,
           start: "top top",
-          end: pinEnd,
-          pin: lgUp,
+          end: "+=200%",
+          pin: true,
           pinType: "fixed",
           scrub: 0.5,
           anticipatePin: 1,
@@ -177,7 +91,7 @@ export default function HeroScannerSection() {
       });
 
       const bioRefs = [nameEl.current, locEl.current, skillsEl.current, aboutEl.current].filter(Boolean);
-      if (bioRefs.length) gsap.set(bioRefs, { opacity: lgUp ? 0 : 1, x: 0 });
+      if (bioRefs.length) gsap.set(bioRefs, { opacity: 0, x: 0 });
 
       // Hero text fades out (gentle — no vertical offset).
       tl.to(heroContent.current, { opacity: 0, duration: 0.12, ease: "power2.inOut" }, 0.04);
@@ -208,17 +122,14 @@ export default function HeroScannerSection() {
         );
       }
 
-      // Bio reveals (desktop). On mobile we keep cards visible to avoid vanishing content.
-      if (lgUp) {
-        const revealBio = (el: HTMLDivElement | null, fromX: number, at: number) => {
-          if (!el) return;
-          tl.fromTo(el, { opacity: 0, x: fromX }, { opacity: 1, x: 0, duration: 0.06, ease: "power2.out" }, at);
-        };
-        revealBio(nameEl.current, -30, 0.355);
-        revealBio(locEl.current, 30, 0.48);
-        revealBio(skillsEl.current, -30, 0.605);
-        revealBio(aboutEl.current, 30, 0.705);
-      }
+      const revealBio = (el: HTMLDivElement | null, fromX: number, at: number) => {
+        if (!el) return;
+        tl.fromTo(el, { opacity: 0, x: fromX }, { opacity: 1, x: 0, duration: 0.06, ease: "power2.out" }, at);
+      };
+      revealBio(nameEl.current, -30, 0.355);
+      revealBio(locEl.current, 30, 0.48);
+      revealBio(skillsEl.current, -30, 0.605);
+      revealBio(aboutEl.current, 30, 0.705);
 
       // Scan complete flash
       const sc = scanComplete.current;
@@ -229,18 +140,12 @@ export default function HeroScannerSection() {
       tl.to(sc, { opacity: 1, duration: 0.008 }, 0.84);
 
       // Skills scatter toward project panels.
-      const spread = lgUp ? 560 : Math.max(120, Math.floor(window.innerWidth * 0.35));
-      const panelOffsets = lgUp
-        ? [
-            { dx: -spread, dy: 80 },
-            { dx: 0, dy: 80 },
-            { dx: spread, dy: 80 },
-          ]
-        : [
-            { dx: -spread, dy: 48 },
-            { dx: 0, dy: 56 },
-            { dx: spread, dy: 48 },
-          ];
+      const spread = 560;
+      const panelOffsets = [
+        { dx: -spread, dy: 80 },
+        { dx: 0, dy: 80 },
+        { dx: spread, dy: 80 },
+      ];
       const tags = section.current?.querySelectorAll(".skill-tag");
       if (tags) {
         tags.forEach((tag, i) => {
@@ -263,9 +168,8 @@ export default function HeroScannerSection() {
         });
       }
 
-      // Fade scanner column only (image + HUD); bio cards stay visible for stacked/mobile layout
       const scanCol = scannerColumnRef.current;
-      if (scanCol && lgUp) {
+      if (scanCol) {
         tl.to(scanCol, { opacity: 0, duration: 0.08, ease: "none" }, 0.92);
       }
     }, section);
@@ -277,9 +181,10 @@ export default function HeroScannerSection() {
     <section
       ref={section}
       id="hero"
-      className="relative h-[100svh] w-full max-w-full overflow-x-hidden overflow-y-hidden lg:h-[100dvh] lg:min-h-[100svh] xl:overflow-x-visible"
+      className="relative w-full max-w-full overflow-x-hidden max-lg:flex max-lg:flex-col max-lg:h-auto max-lg:min-h-0 max-lg:overflow-y-visible lg:h-[100dvh] lg:min-h-[100svh] lg:overflow-y-hidden xl:overflow-x-visible"
       style={{ background: "var(--background)" }}
     >
+      <div className="relative w-full min-h-[100svh] shrink-0 overflow-hidden lg:absolute lg:inset-0 lg:min-h-0 lg:h-full">
       <div className="absolute inset-0 bg-grid opacity-30" />
       <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 50% 50%, rgba(0,212,200,0.04) 0%, transparent 55%)" }} />
       <div className="absolute inset-0 overflow-hidden opacity-15 pointer-events-none"><div className="mesh-rotate" /></div>
@@ -314,12 +219,13 @@ export default function HeroScannerSection() {
           </div>
         </div>
       </div>
+      </div>
 
-      {/* Scanner container */}
+      {/* Scanner — below hero in flow on mobile (opacity never depends on Lenis+ST); overlay on lg+ */}
       <div
         ref={scannerWrap}
         id="scanner"
-        className="pointer-events-none absolute inset-0 z-20 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-y-auto overflow-x-hidden opacity-0 max-lg:items-start max-lg:justify-start xl:overflow-x-visible xl:overflow-y-visible"
+        className="pointer-events-none max-lg:pointer-events-auto z-20 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-x-hidden max-lg:relative max-lg:inset-auto max-lg:h-auto max-lg:w-full max-lg:flex-none max-lg:overflow-y-visible max-lg:opacity-100 max-lg:items-start max-lg:justify-start max-lg:py-4 lg:absolute lg:inset-0 lg:overflow-y-auto lg:opacity-0 xl:overflow-x-visible xl:overflow-y-visible"
       >
         <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-4 pt-1 sm:px-4 sm:pb-8 max-lg:pt-[env(safe-area-inset-top,12px)] xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:pt-0 xl:px-0">
           <div
