@@ -124,8 +124,8 @@ export default function ContactSection() {
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: section.current,
-            start: "top bottom",
-            end: "bottom top",
+            start: "top 65%",
+            end: "top 5%",
             scrub: 1,
           },
         });
