@@ -129,24 +129,7 @@ export default function HeroScannerSection() {
         }
         const t = 0.46;
 
-        // Skills scatter on mobile — fan out toward three panel positions then fade
-        const mobileSpread = Math.max(80, Math.floor(window.innerWidth * 0.28));
-        const mobilePanelOffsets = [
-          { dx: -mobileSpread, dy: 40 },
-          { dx: 0, dy: 55 },
-          { dx: mobileSpread, dy: 40 },
-        ];
-        const mobileTags = section.current?.querySelectorAll(".skill-tag");
-        if (mobileTags) {
-          mobileTags.forEach((tag, idx) => {
-            const target = mobilePanelOffsets[idx % mobilePanelOffsets.length];
-            mobileTl.to(
-              tag,
-              { x: target.dx, y: target.dy, opacity: 0, scale: 0.2, duration: 0.08, ease: "power2.in" },
-              t + idx * 0.003,
-            );
-          });
-        }
+        // Keep skills static on mobile (no scatter animation).
 
         // Fade the scanner column out once scatter completes
         if (scannerColumnRef.current) {
@@ -352,6 +335,7 @@ export default function HeroScannerSection() {
         <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-4 pt-1 sm:px-4 sm:pb-8 max-lg:touch-pan-y max-lg:pt-[max(1.25rem,calc(env(safe-area-inset-top,12px)+6.5rem))] max-lg:pb-8 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:pt-0 xl:px-0">
           <div
             ref={scannerColumnRef}
+            id="scanner-section"
             className="relative w-full max-w-[380px] shrink-0 max-lg:mt-[min(44vh,20rem)] max-lg:touch-pan-y lg:mt-0 lg:pb-40 lg:touch-auto xl:absolute xl:left-1/2 xl:top-1/2 xl:max-w-none xl:w-auto xl:-translate-x-1/2 xl:-translate-y-1/2 xl:pb-0"
           >
             <div className="relative w-full max-lg:max-w-[260px] max-lg:mx-auto max-lg:touch-pan-y">
