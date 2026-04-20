@@ -347,12 +347,12 @@ export default function HeroScannerSection() {
         id="scanner"
         className="pointer-events-none absolute inset-0 z-20 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-y-auto overflow-x-hidden opacity-0 max-lg:items-start max-lg:justify-center max-lg:px-3 xl:overflow-x-visible xl:overflow-y-visible"
       >
-        <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-4 pt-1 sm:px-4 sm:pb-8 max-lg:pt-[max(0.75rem,calc(env(safe-area-inset-top,12px)+4rem))] max-lg:pb-8 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:pt-0 xl:px-0">
+        <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-4 pt-1 sm:px-4 sm:pb-8 max-lg:pt-[max(1.25rem,calc(env(safe-area-inset-top,12px)+6.5rem))] max-lg:pb-8 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:pt-0 xl:px-0">
           <div
             ref={scannerColumnRef}
-            className="relative w-full max-w-[380px] shrink-0 max-lg:mt-6 max-lg:-translate-y-1 lg:mt-0 lg:translate-y-0 lg:pb-40 xl:absolute xl:left-1/2 xl:top-1/2 xl:max-w-none xl:w-auto xl:-translate-x-1/2 xl:-translate-y-1/2 xl:pb-0"
+            className="relative w-full max-w-[380px] shrink-0 max-lg:mt-[min(44vh,20rem)] lg:mt-0 lg:pb-40 xl:absolute xl:left-1/2 xl:top-1/2 xl:max-w-none xl:w-auto xl:-translate-x-1/2 xl:-translate-y-1/2 xl:pb-0"
           >
-            <div className="relative w-full max-lg:max-w-[260px] max-lg:mx-auto max-lg:translate-y-1">
+            <div className="relative w-full max-lg:max-w-[260px] max-lg:mx-auto">
               <Image
                 src="/scanner.png"
                 alt="Character being scanned"
