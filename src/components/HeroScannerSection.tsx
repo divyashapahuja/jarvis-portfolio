@@ -105,8 +105,9 @@ export default function HeroScannerSection() {
         gsap.set(counter.current, { textContent: "0" });
         if (circleProgress.current) gsap.set(circleProgress.current, { strokeDashoffset: CIRCUMFERENCE });
         const bioRefsMobile = [nameEl.current, locEl.current, skillsEl.current, aboutEl.current].filter(Boolean);
-        if (bioRefsMobile.length) gsap.set(bioRefsMobile, { opacity: 0, x: 0 });
-
+        if (bioRefsMobile.length) gsap.set(bioRefsMobile, { opacity: 1, x: 0 });
+        // Bio folder tweens are not scrubbed on mobile: unpinned ST often never reached the old reveal
+        // window (opacity stayed 0), and overflow-y-auto on this layer clipped folders below the fold.
         const mobileTl = gsap.timeline({
           scrollTrigger: {
             trigger: section.current,
@@ -135,26 +136,7 @@ export default function HeroScannerSection() {
             0.26,
           );
         }
-        // Each folder gets its own beat (~25% more scroll vs one short stagger block).
-        const revealDur = 0.12;
-        const step = 0.10;
         let t = 0.46;
-        if (nameEl.current) {
-          mobileTl.to(nameEl.current, { opacity: 1, x: 0, duration: revealDur, ease: "power2.out" }, t);
-          t += step;
-        }
-        if (locEl.current) {
-          mobileTl.to(locEl.current, { opacity: 1, x: 0, duration: revealDur, ease: "power2.out" }, t);
-          t += step;
-        }
-        if (skillsEl.current) {
-          mobileTl.to(skillsEl.current, { opacity: 1, x: 0, duration: revealDur, ease: "power2.out" }, t);
-          t += step;
-        }
-        if (aboutEl.current) {
-          mobileTl.to(aboutEl.current, { opacity: 1, x: 0, duration: revealDur, ease: "power2.out" }, t);
-          t += step;
-        }
 
         // Skills scatter on mobile — fan out toward three panel positions then fade
         const mobileSpread = Math.max(80, Math.floor(window.innerWidth * 0.28));
@@ -345,7 +327,7 @@ export default function HeroScannerSection() {
       <div
         ref={scannerWrap}
         id="scanner"
-        className="pointer-events-none absolute inset-0 z-20 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-y-auto overflow-x-hidden opacity-0 max-lg:items-start max-lg:justify-center max-lg:px-3 xl:overflow-x-visible xl:overflow-y-visible"
+        className="pointer-events-none absolute inset-0 z-20 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-x-hidden opacity-0 max-lg:items-start max-lg:justify-center max-lg:overflow-y-visible max-lg:px-3 lg:overflow-y-auto xl:overflow-x-visible xl:overflow-y-visible"
       >
         <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-4 pt-1 sm:px-4 sm:pb-8 max-lg:pt-[max(1.25rem,calc(env(safe-area-inset-top,12px)+6.5rem))] max-lg:pb-8 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:pt-0 xl:px-0">
           <div
