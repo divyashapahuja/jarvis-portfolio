@@ -112,9 +112,10 @@ export default function HeroScannerSection() {
             trigger: section.current,
             start: "top top",
             end: "+=132%",
-            pin: true,
+            // Pinning the hero + opening a fixed full-screen layer reliably crashes Android Chrome
+            // ("The page couldn't load"). Scrub the same timeline without pin — scroll drives progress.
+            pin: false,
             scrub: 0.72,
-            anticipatePin: 1,
           },
         });
 

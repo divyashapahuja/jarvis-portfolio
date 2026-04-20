@@ -66,8 +66,7 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!menuOpen) return;
-    // `body { overflow: hidden }` while ScrollTrigger has the hero pinned can crash Android Chrome
-    // ("The page couldn't load") when opening this drawer. Lock scroll on lg+ only.
+    // Avoid mutating document scroll/body while ScrollTrigger is active — unstable on some mobile GPUs.
     let mq: MediaQueryList;
     try {
       mq = window.matchMedia("(min-width: 1024px)");
@@ -164,20 +163,19 @@ export default function Navbar() {
 
       {menuOpen ? (
         <div
-          className="fixed inset-0 z-[60] touch-none overscroll-none lg:hidden"
-          style={{ overscrollBehavior: "none" }}
+          className="fixed inset-0 z-[100] lg:hidden"
           role="dialog"
           aria-modal="true"
           aria-label="Site navigation"
         >
           <button
             type="button"
-            className="absolute inset-0 bg-black/70 touch-none"
+            className="absolute inset-0 bg-black/70"
             aria-label="Close menu"
             onClick={() => setMenuOpen(false)}
           />
           <div
-            className="absolute top-0 right-0 flex h-full w-[min(100%,320px)] flex-col border-l border-neon/20 bg-[rgba(5,5,8,0.98)] shadow-[0_0_40px_rgba(0,212,200,0.08)] touch-pan-y overflow-y-auto overscroll-contain pt-[max(1.25rem,env(safe-area-inset-top))]"
+            className="absolute top-0 right-0 flex h-full w-[min(100%,320px)] flex-col border-l border-neon/20 bg-[rgba(5,5,8,0.98)] shadow-[0_0_40px_rgba(0,212,200,0.08)] overflow-y-auto overscroll-contain pt-[max(1.25rem,env(safe-area-inset-top))]"
           >
             <div className="flex items-center justify-between border-b border-neon/10 px-4 py-3">
               <span className="text-[10px] tracking-[0.3em] text-neon/50" style={{ fontFamily: "IBM Plex Mono, monospace" }}>
