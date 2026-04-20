@@ -166,9 +166,7 @@ export default function ExperienceSection() {
     const ctx = gsap.context(() => {
       const touchCoarse =
         typeof window !== "undefined" &&
-        !window.matchMedia("(min-width: 1024px)").matches &&
-        (window.matchMedia("(max-width: 1023px)").matches ||
-          window.matchMedia("(pointer: coarse)").matches);
+        window.matchMedia("(max-width: 1023px)").matches;
       const drawStroke = (el: SVGGeometryElement | null) => {
         if (!el) return;
         const len = el.getTotalLength();
@@ -231,9 +229,7 @@ export default function ExperienceSection() {
       const lgUp = typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches;
       const touchCoarse =
         typeof window !== "undefined" &&
-        !window.matchMedia("(min-width: 1024px)").matches &&
-        (window.matchMedia("(max-width: 1023px)").matches ||
-          window.matchMedia("(pointer: coarse)").matches);
+        window.matchMedia("(max-width: 1023px)").matches;
       cards?.forEach((card, i) => {
         const isLeft = i % 2 === 0;
         gsap.fromTo(

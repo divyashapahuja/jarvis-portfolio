@@ -95,9 +95,7 @@ export default function ContactSection() {
 
       const touchCoarse =
         typeof window !== "undefined" &&
-        !window.matchMedia("(min-width: 1024px)").matches &&
-        (window.matchMedia("(max-width: 1023px)").matches ||
-          window.matchMedia("(pointer: coarse)").matches);
+        window.matchMedia("(max-width: 1023px)").matches;
 
       const buildHudTimeline = () => {
         const tl = gsap.timeline({ paused: true });

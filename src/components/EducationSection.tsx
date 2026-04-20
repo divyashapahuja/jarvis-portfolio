@@ -216,9 +216,7 @@ export default function EducationSection() {
     const ctx = gsap.context(() => {
       const touchCoarse =
         typeof window !== "undefined" &&
-        !window.matchMedia("(min-width: 1024px)").matches &&
-        (window.matchMedia("(max-width: 1023px)").matches ||
-          window.matchMedia("(pointer: coarse)").matches);
+        window.matchMedia("(max-width: 1023px)").matches;
       const rows = section.current?.querySelectorAll(".edu-hud-row");
       rows?.forEach((row) => {
         gsap.fromTo(
