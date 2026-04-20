@@ -221,16 +221,16 @@ export default function ProjectsSection() {
     <section
       ref={section}
       id="projects"
-      className="relative mt-0 flex w-full flex-col items-center overflow-hidden max-lg:mt-8"
-      style={{ background: "var(--background)", paddingTop: "12px", paddingBottom: "80px" }}
+      className="relative mt-0 flex w-full flex-col items-center overflow-hidden pt-3 pb-[80px] max-lg:mt-[min(26vh,12rem)] max-lg:pt-12"
+      style={{ background: "var(--background)" }}
     >
       <div className="absolute inset-0 bg-grid opacity-10" />
       <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 50% 40%, rgba(0,212,200,0.03) 0%, transparent 60%)" }} />
 
-      <div className="mb-10 px-4 text-center">
+      <div className="mb-10 max-lg:mb-12 max-lg:mt-2 px-4 text-center sm:px-6">
         <p className="text-[10px] tracking-[0.3em] uppercase text-neon/40 mb-3" style={{ fontFamily: "IBM Plex Mono, monospace" }}>— Project Archives —</p>
         <h2 className="text-3xl lg:text-5xl font-bold text-white text-glow mb-3" style={{ fontFamily: "Orbitron, sans-serif" }}>Holographic Display</h2>
-        <p className="text-white/30 text-sm">Drag or use arrows to navigate</p>
+        <p className="text-white/30 text-sm max-lg:text-white/45">Drag or use arrows to navigate</p>
       </div>
 
       <div
