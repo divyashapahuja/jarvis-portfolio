@@ -74,11 +74,24 @@ export default function HeroScannerSection() {
   const aboutEl = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Suppress ResizeObserver loop errors that crash Android Chrome when GSAP
+    // ScrollTrigger mutates the DOM inside a ResizeObserver callback.
+    const resizeHandler = (e: ErrorEvent) => {
+      if (e.message?.includes("ResizeObserver")) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+      }
+    };
+    window.addEventListener("error", resizeHandler);
+
     let rafId: number;
     let ctx: ReturnType<typeof gsap.context>;
 
+    // Double RAF ensures browser has completed layout/paint before GSAP measures anything.
     rafId = requestAnimationFrame(() => {
-      ctx = gsap.context(() => {
+      requestAnimationFrame(() => {
+        ScrollTrigger.config({ ignoreMobileResize: true });
+        ctx = gsap.context(() => {
       const lgUp = window.matchMedia("(min-width: 1024px)").matches;
 
       // Mobile: short pinned scroll-driven transition (hero -> scanner) so it stays in-view.
@@ -275,11 +288,13 @@ export default function HeroScannerSection() {
         tl.to(scanCol, { opacity: 0, duration: 0.08, ease: "none" }, 0.92);
       }
     }, section);
-    }); // end requestAnimationFrame
+      }); // end inner RAF
+    }); // end outer RAF
 
     return () => {
       cancelAnimationFrame(rafId);
       ctx?.revert();
+      window.removeEventListener("error", resizeHandler);
     };
   }, []);
 
