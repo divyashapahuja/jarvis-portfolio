@@ -285,15 +285,15 @@ export default function HeroScannerSection() {
     <section
       ref={section}
       id="hero"
-      className="relative h-[100svh] w-full max-w-full overflow-x-hidden max-lg:overflow-y-visible lg:overflow-y-hidden lg:h-[100dvh] lg:min-h-[100svh] xl:overflow-x-visible"
+      className="relative h-[100svh] w-full max-w-full overflow-x-hidden max-lg:h-auto max-lg:min-h-[calc(100svh+clamp(18rem,46vh,36rem))] max-lg:overflow-y-visible lg:overflow-y-hidden lg:h-[100dvh] lg:min-h-[100svh] xl:overflow-x-visible"
       style={{ background: "var(--background)" }}
     >
       <div className="absolute inset-0 bg-grid opacity-30" />
       <div className="absolute inset-0" style={{ background: "radial-gradient(circle at 50% 50%, rgba(0,212,200,0.04) 0%, transparent 55%)" }} />
       <div className="absolute inset-0 overflow-hidden opacity-15 pointer-events-none"><div className="mesh-rotate" /></div>
 
-      {/* Flash overlay */}
-      <div ref={flash} className="absolute inset-0 z-30 pointer-events-none opacity-0" style={{ background: "radial-gradient(circle, rgba(0,212,200,0.8) 0%, #050508 80%)" }} />
+      {/* Flash overlay — below scanner on mobile so it never paints over folder HUD */}
+      <div ref={flash} className="absolute inset-0 z-30 max-lg:z-[15] pointer-events-none opacity-0" style={{ background: "radial-gradient(circle, rgba(0,212,200,0.8) 0%, #050508 80%)" }} />
 
       {/* Hero content */}
       <div
@@ -327,7 +327,7 @@ export default function HeroScannerSection() {
       <div
         ref={scannerWrap}
         id="scanner"
-        className="pointer-events-none absolute inset-0 z-20 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-x-hidden opacity-0 max-lg:items-start max-lg:justify-center max-lg:overflow-y-visible max-lg:px-3 lg:overflow-y-auto xl:overflow-x-visible xl:overflow-y-visible"
+        className="pointer-events-none absolute inset-0 z-20 max-lg:z-25 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-x-hidden opacity-0 max-lg:items-start max-lg:justify-center max-lg:overflow-y-visible max-lg:px-3 lg:z-20 lg:overflow-y-auto xl:overflow-x-visible xl:overflow-y-visible"
       >
         <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-4 pt-1 sm:px-4 sm:pb-8 max-lg:pt-[max(1.25rem,calc(env(safe-area-inset-top,12px)+6.5rem))] max-lg:pb-8 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:pt-0 xl:px-0">
           <div
@@ -415,7 +415,7 @@ export default function HeroScannerSection() {
           </div>
 
           {/* Bio cards — column below ~1280px; orbit HUD only on xl+ (avoids clipping inside overflow-hidden hero) */}
-          <div className="relative z-30 flex flex-col gap-3 w-full max-w-md mt-8 max-lg:grid max-lg:grid-cols-2 max-lg:gap-2 max-lg:mt-3 max-lg:pb-2 sm:max-w-lg max-xl:mt-8 xl:absolute xl:inset-0 xl:mt-0 xl:max-w-none xl:min-h-0 xl:pointer-events-none">
+          <div className="relative z-30 flex flex-col gap-3 w-full max-w-md mt-8 max-lg:z-40 max-lg:grid max-lg:grid-cols-2 max-lg:gap-2 max-lg:mt-3 max-lg:pb-2 max-lg:pointer-events-auto sm:max-w-lg max-xl:mt-8 xl:absolute xl:inset-0 xl:mt-0 xl:max-w-none xl:min-h-0 xl:pointer-events-none">
             {/* xl+: anchor HUD to viewport center so cards stay in-frame on laptops (old negative left/right sat off-screen) */}
             <div className="w-full xl:pointer-events-auto xl:absolute xl:bottom-[12%] xl:left-[max(0.75rem,calc(50%-31rem))] xl:w-auto xl:max-w-[min(16rem,42vw)]">
               <BioCard label="Name" side="left" innerRef={nameEl}>
