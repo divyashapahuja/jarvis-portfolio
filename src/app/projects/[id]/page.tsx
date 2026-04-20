@@ -129,7 +129,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
         {/* Bottom nav */}
         <div className="mt-24 flex flex-col gap-4 border-t border-neon/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
           <Link
-            href={`/#projects-${projects[0]?.id ?? "alpha"}`}
+            href="/#projects"
             className="inline-flex items-center gap-2 text-xs text-neon/60 hover:text-neon transition-colors"
             style={{ fontFamily: "IBM Plex Mono, monospace" }}
           >

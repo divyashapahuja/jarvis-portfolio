@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 const LINKS = [
   {
     label: "About",
-    href: "#scanner",
+    href: "#scan-complete",
     scrollToScanComplete: true,
     icon: (
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
@@ -89,7 +89,7 @@ export default function Navbar() {
     const scrollBehavior: ScrollBehavior = prefersCoarse ? "auto" : "smooth";
 
     // Always scroll to the actual section id from the nav link.
-    // For "About", this is #scanner (not a computed hero offset).
+    // For "About", this is #scan-complete (100% scanner marker).
     const el = document.querySelector(link.href);
     if (el) el.scrollIntoView({ behavior: scrollBehavior, block: "start" });
     setMenuOpen(false);

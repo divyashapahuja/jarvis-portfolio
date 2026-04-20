@@ -362,6 +362,7 @@ export default function HeroScannerSection() {
             {/* Scan complete */}
             <div
               ref={scanComplete}
+              id="scan-complete"
               className="pointer-events-none absolute bottom-[-26px] left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 opacity-0 sm:bottom-[-30px] sm:gap-3"
             >
               <div className="hud-blink h-2 w-2 shrink-0 rounded-full sm:h-2.5 sm:w-2.5" style={{ background: "var(--teal)", boxShadow: "0 0 10px var(--teal)" }} />

@@ -166,6 +166,7 @@ export default function ExperienceSection() {
     const ctx = gsap.context(() => {
       const touchCoarse =
         typeof window !== "undefined" &&
+        !window.matchMedia("(min-width: 1024px)").matches &&
         (window.matchMedia("(max-width: 1023px)").matches ||
           window.matchMedia("(pointer: coarse)").matches);
       const drawStroke = (el: SVGGeometryElement | null) => {
@@ -230,6 +231,7 @@ export default function ExperienceSection() {
       const lgUp = typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches;
       const touchCoarse =
         typeof window !== "undefined" &&
+        !window.matchMedia("(min-width: 1024px)").matches &&
         (window.matchMedia("(max-width: 1023px)").matches ||
           window.matchMedia("(pointer: coarse)").matches);
       cards?.forEach((card, i) => {
