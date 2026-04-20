@@ -84,201 +84,230 @@ export default function HeroScannerSection() {
     };
     window.addEventListener("error", resizeHandler);
 
-    let rafId: number;
-    let ctx: ReturnType<typeof gsap.context>;
+    let rafId: number | undefined;
+    let mobileBootstrapCancelled = false;
+    let ctx: ReturnType<typeof gsap.context> | undefined;
     let removeMobileHeroScroll: (() => void) | undefined;
 
-    // Double RAF ensures browser has completed layout/paint before GSAP measures anything.
-    rafId = requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        ScrollTrigger.config({ ignoreMobileResize: true });
-        ctx = gsap.context(() => {
-      const lgUp = window.matchMedia("(min-width: 1024px)").matches;
+    const bootstrapGsap = () => {
+      ctx = gsap.context(() => {
+        const lgUp = window.matchMedia("(min-width: 1024px)").matches;
 
-      // Mobile: drive intro with a paused timeline + passive scroll (no ScrollTrigger scrub).
-      // Scrubbed ST on touch competes with momentum scrolling and feels laggy / stuck.
-      if (!lgUp) {
-        gsap.set(heroContent.current, { opacity: 1, y: 0 });
-        gsap.set(deskWrap.current, { opacity: 1 });
-        gsap.set(scannerWrap.current, { opacity: 0 });
-        gsap.set(scannerColumnRef.current, { opacity: 1 });
-        gsap.set(flash.current, { opacity: 0 });
-        gsap.set(scanLine.current, { top: "100%" });
-        gsap.set(counter.current, { textContent: "0" });
-        if (circleProgress.current) gsap.set(circleProgress.current, { strokeDashoffset: CIRCUMFERENCE });
-        const bioRefsMobile = [nameEl.current, locEl.current, skillsEl.current, aboutEl.current].filter(Boolean);
-        if (bioRefsMobile.length) gsap.set(bioRefsMobile, { opacity: 1, x: 0 });
+        // Mobile: drive intro with a paused timeline + passive scroll (no ScrollTrigger scrub).
+        // Scrubbed ST on touch competes with momentum scrolling and feels laggy / stuck.
+        if (!lgUp) {
+          ScrollTrigger.config({ ignoreMobileResize: true });
+          gsap.set(heroContent.current, { opacity: 1, y: 0 });
+          gsap.set(deskWrap.current, { opacity: 1 });
+          gsap.set(scannerWrap.current, { opacity: 0 });
+          gsap.set(scannerColumnRef.current, { opacity: 1 });
+          gsap.set(flash.current, { opacity: 0 });
+          gsap.set(scanLine.current, { top: "100%" });
+          gsap.set(counter.current, { textContent: "0" });
+          if (circleProgress.current) gsap.set(circleProgress.current, { strokeDashoffset: CIRCUMFERENCE });
+          const bioRefsMobile = [nameEl.current, locEl.current, skillsEl.current, aboutEl.current].filter(Boolean);
+          if (bioRefsMobile.length) gsap.set(bioRefsMobile, { opacity: 1, x: 0 });
 
-        const mobileTl = gsap.timeline({ paused: true });
+          const mobileTl = gsap.timeline({ paused: true });
 
-        // Crossfade hero → scanner (opacity only — no layout offset).
-        mobileTl.to(heroContent.current, { opacity: 0, duration: 0.26, ease: "power2.inOut" }, 0.05);
-        mobileTl.to(deskWrap.current, { opacity: 0, duration: 0.28, ease: "power2.inOut" }, "<0.06");
-        mobileTl.to(scannerWrap.current, { opacity: 1, duration: 0.32, ease: "power2.out" }, "<0.14");
-        mobileTl.to(flash.current, { opacity: 0.14, duration: 0.08, ease: "sine.out" }, 0.18);
-        mobileTl.to(flash.current, { opacity: 0, duration: 0.16, ease: "sine.in" }, 0.24);
-        mobileTl.fromTo(scanLine.current, { top: "100%" }, { top: "0%", duration: 0.58, ease: "power1.inOut" }, 0.26);
-        mobileTl.fromTo(counter.current, { textContent: "0" }, { textContent: "100", snap: { textContent: 1 }, duration: 0.58, ease: "power1.inOut" }, 0.26);
-        if (circleProgress.current) {
+          // Crossfade hero → scanner (opacity only — no layout offset).
+          mobileTl.to(heroContent.current, { opacity: 0, duration: 0.26, ease: "power2.inOut" }, 0.05);
+          mobileTl.to(deskWrap.current, { opacity: 0, duration: 0.28, ease: "power2.inOut" }, "<0.06");
+          mobileTl.to(scannerWrap.current, { opacity: 1, duration: 0.32, ease: "power2.out" }, "<0.14");
+          mobileTl.to(flash.current, { opacity: 0.14, duration: 0.08, ease: "sine.out" }, 0.18);
+          mobileTl.to(flash.current, { opacity: 0, duration: 0.16, ease: "sine.in" }, 0.24);
+          mobileTl.fromTo(scanLine.current, { top: "100%" }, { top: "0%", duration: 0.58, ease: "power1.inOut" }, 0.26);
           mobileTl.fromTo(
-            circleProgress.current,
-            { strokeDashoffset: CIRCUMFERENCE },
-            { strokeDashoffset: 0, duration: 0.58, ease: "power1.inOut" },
+            counter.current,
+            { textContent: "0" },
+            { textContent: "100", snap: { textContent: 1 }, duration: 0.58, ease: "power1.inOut" },
             0.26,
           );
+          if (circleProgress.current) {
+            mobileTl.fromTo(
+              circleProgress.current,
+              { strokeDashoffset: CIRCUMFERENCE },
+              { strokeDashoffset: 0, duration: 0.58, ease: "power1.inOut" },
+              0.26,
+            );
+          }
+          const t = 0.46;
+
+          // Keep skills static on mobile (no scatter animation).
+
+          // Fade the scanner column out once scatter completes
+          if (scannerColumnRef.current) {
+            mobileTl.to(scannerColumnRef.current, { opacity: 0, duration: 0.06, ease: "none" }, t + 0.12);
+          }
+
+          const scrollRange = () => Math.max(window.innerHeight * 0.82, 420);
+          const syncHeroScroll = () => {
+            const el = section.current;
+            if (!el) return;
+            const top = el.getBoundingClientRect().top;
+            const range = scrollRange();
+            const p = Math.min(1, Math.max(0, -top / range));
+            mobileTl.progress(p);
+          };
+
+          let scheduled = false;
+          const onScrollOrResize = () => {
+            if (scheduled) return;
+            scheduled = true;
+            requestAnimationFrame(() => {
+              scheduled = false;
+              syncHeroScroll();
+            });
+          };
+
+          window.addEventListener("scroll", onScrollOrResize, { passive: true });
+          window.addEventListener("resize", onScrollOrResize, { passive: true });
+          syncHeroScroll();
+          removeMobileHeroScroll = () => {
+            window.removeEventListener("scroll", onScrollOrResize);
+            window.removeEventListener("resize", onScrollOrResize);
+          };
+
+          return;
         }
-        const t = 0.46;
 
-        // Keep skills static on mobile (no scatter animation).
+        const pinEnd = lgUp ? "+=200%" : "+=180%";
 
-        // Fade the scanner column out once scatter completes
-        if (scannerColumnRef.current) {
-          mobileTl.to(scannerColumnRef.current, { opacity: 0, duration: 0.06, ease: "none" }, t + 0.12);
-        }
-
-        const scrollRange = () => Math.max(window.innerHeight * 0.82, 420);
-        const syncHeroScroll = () => {
-          const el = section.current;
-          if (!el) return;
-          const top = el.getBoundingClientRect().top;
-          const range = scrollRange();
-          const p = Math.min(1, Math.max(0, -top / range));
-          mobileTl.progress(p);
-        };
-
-        let scheduled = false;
-        const onScrollOrResize = () => {
-          if (scheduled) return;
-          scheduled = true;
-          requestAnimationFrame(() => {
-            scheduled = false;
-            syncHeroScroll();
-          });
-        };
-
-        window.addEventListener("scroll", onScrollOrResize, { passive: true });
-        window.addEventListener("resize", onScrollOrResize, { passive: true });
-        syncHeroScroll();
-        removeMobileHeroScroll = () => {
-          window.removeEventListener("scroll", onScrollOrResize);
-          window.removeEventListener("resize", onScrollOrResize);
-        };
-
-        return;
-      }
-
-      const pinEnd = lgUp ? "+=200%" : "+=180%";
-
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section.current,
-          start: "top top",
-          end: pinEnd,
-          pin: lgUp,
-          scrub: 0.5,
-          anticipatePin: 1,
-        },
-      });
-
-      const bioRefs = [nameEl.current, locEl.current, skillsEl.current, aboutEl.current].filter(Boolean);
-      if (bioRefs.length) gsap.set(bioRefs, { opacity: lgUp ? 0 : 1, x: 0 });
-
-      // Hero text fades out (gentle — no vertical offset).
-      tl.to(heroContent.current, { opacity: 0, duration: 0.12, ease: "power2.inOut" }, 0.04);
-      // Desk slowly zooms
-      tl.to(deskScale.current, { scale: 1.25, ease: "power1.out", duration: 0.18 }, 0);
-
-      // Glitch effect
-      tl.to(deskScale.current, { x: -6, filter: "hue-rotate(90deg) brightness(1.5)", duration: 0.012 }, 0.18)
-        .to(deskScale.current, { x: 5, y: -3, filter: "hue-rotate(200deg) brightness(2)", duration: 0.012 })
-        .to(deskScale.current, { x: -3, y: 4, filter: "hue-rotate(300deg) brightness(0.5)", duration: 0.012 })
-        .to(deskScale.current, { x: 0, y: 0, filter: "none", duration: 0.008 });
-
-      // Flash + crossfade
-      tl.to(flash.current, { opacity: 0.38, duration: 0.05, ease: "sine.out" }, 0.20);
-      tl.to(flash.current, { opacity: 0, duration: 0.1, ease: "sine.in" }, 0.24);
-      tl.to(deskWrap.current, { opacity: 0, duration: 0.1, ease: "power2.inOut" }, 0.20);
-      tl.to(scannerWrap.current, { opacity: 1, duration: 0.12, ease: "power2.out" }, 0.22);
-
-      // Scanner scan line sweeps upward
-      tl.fromTo(scanLine.current, { top: "100%" }, { top: "0%", ease: "power1.inOut", duration: 0.50 }, 0.28);
-      tl.fromTo(counter.current, { textContent: "0" }, { textContent: "100", snap: { textContent: 1 }, ease: "power1.inOut", duration: 0.50 }, 0.28);
-
-      if (circleProgress.current) {
-        tl.fromTo(circleProgress.current,
-          { strokeDashoffset: CIRCUMFERENCE },
-          { strokeDashoffset: 0, ease: "power1.inOut", duration: 0.50 },
-          0.28
-        );
-      }
-
-      // Bio reveals (desktop). On mobile we keep cards visible to avoid vanishing content.
-      if (lgUp) {
-        const revealBio = (el: HTMLDivElement | null, fromX: number, at: number) => {
-          if (!el) return;
-          tl.fromTo(el, { opacity: 0, x: fromX }, { opacity: 1, x: 0, duration: 0.06, ease: "power2.out" }, at);
-        };
-        revealBio(nameEl.current, -30, 0.355);
-        revealBio(locEl.current, 30, 0.48);
-        revealBio(skillsEl.current, -30, 0.605);
-        revealBio(aboutEl.current, 30, 0.705);
-      }
-
-      // Scan complete flash
-      const sc = scanComplete.current;
-      tl.to(sc, { opacity: 1, duration: 0.008 }, 0.80);
-      tl.to(sc, { opacity: 0, duration: 0.008 }, 0.81);
-      tl.to(sc, { opacity: 1, duration: 0.008 }, 0.82);
-      tl.to(sc, { opacity: 0, duration: 0.008 }, 0.83);
-      tl.to(sc, { opacity: 1, duration: 0.008 }, 0.84);
-
-      // Skills scatter toward project panels.
-      const spread = lgUp ? 560 : Math.max(120, Math.floor(window.innerWidth * 0.35));
-      const panelOffsets = lgUp
-        ? [
-            { dx: -spread, dy: 80 },
-            { dx: 0, dy: 80 },
-            { dx: spread, dy: 80 },
-          ]
-        : [
-            { dx: -spread, dy: 48 },
-            { dx: 0, dy: 56 },
-            { dx: spread, dy: 48 },
-          ];
-      const tags = section.current?.querySelectorAll(".skill-tag");
-      if (tags) {
-        tags.forEach((tag, i) => {
-          const target = panelOffsets[i % panelOffsets.length];
-          const rect = tag.getBoundingClientRect();
-          const cx = window.innerWidth / 2;
-          const cy = window.innerHeight / 2;
-          tl.to(
-            tag,
-            {
-              x: cx + target.dx - rect.left - rect.width / 2,
-              y: cy + target.dy - rect.top,
-              opacity: 0,
-              scale: 0.15,
-              duration: 0.10,
-              ease: "power2.in",
-            },
-            0.87 + i * 0.004,
-          );
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section.current,
+            start: "top top",
+            end: pinEnd,
+            pin: lgUp,
+            scrub: 0.5,
+            anticipatePin: 1,
+          },
         });
-      }
 
-      // Fade scanner column only (image + HUD); bio cards stay visible for stacked/mobile layout
-      const scanCol = scannerColumnRef.current;
-      if (scanCol && lgUp) {
-        tl.to(scanCol, { opacity: 0, duration: 0.08, ease: "none" }, 0.92);
-      }
-    }, section);
-      }); // end inner RAF
-    }); // end outer RAF
+        const bioRefs = [nameEl.current, locEl.current, skillsEl.current, aboutEl.current].filter(Boolean);
+        if (bioRefs.length) gsap.set(bioRefs, { opacity: lgUp ? 0 : 1, x: 0 });
+
+        // Hero text fades out (gentle — no vertical offset).
+        tl.to(heroContent.current, { opacity: 0, duration: 0.12, ease: "power2.inOut" }, 0.04);
+        // Desk slowly zooms
+        tl.to(deskScale.current, { scale: 1.25, ease: "power1.out", duration: 0.18 }, 0);
+
+        // Glitch effect
+        tl.to(deskScale.current, { x: -6, filter: "hue-rotate(90deg) brightness(1.5)", duration: 0.012 }, 0.18)
+          .to(deskScale.current, { x: 5, y: -3, filter: "hue-rotate(200deg) brightness(2)", duration: 0.012 })
+          .to(deskScale.current, { x: -3, y: 4, filter: "hue-rotate(300deg) brightness(0.5)", duration: 0.012 })
+          .to(deskScale.current, { x: 0, y: 0, filter: "none", duration: 0.008 });
+
+        // Flash + crossfade
+        tl.to(flash.current, { opacity: 0.38, duration: 0.05, ease: "sine.out" }, 0.2);
+        tl.to(flash.current, { opacity: 0, duration: 0.1, ease: "sine.in" }, 0.24);
+        tl.to(deskWrap.current, { opacity: 0, duration: 0.1, ease: "power2.inOut" }, 0.2);
+        tl.to(scannerWrap.current, { opacity: 1, duration: 0.12, ease: "power2.out" }, 0.22);
+
+        // Scanner scan line sweeps upward
+        tl.fromTo(scanLine.current, { top: "100%" }, { top: "0%", ease: "power1.inOut", duration: 0.5 }, 0.28);
+        tl.fromTo(
+          counter.current,
+          { textContent: "0" },
+          { textContent: "100", snap: { textContent: 1 }, ease: "power1.inOut", duration: 0.5 },
+          0.28,
+        );
+
+        if (circleProgress.current) {
+          tl.fromTo(
+            circleProgress.current,
+            { strokeDashoffset: CIRCUMFERENCE },
+            { strokeDashoffset: 0, ease: "power1.inOut", duration: 0.5 },
+            0.28,
+          );
+        }
+
+        // Bio reveals (desktop). On mobile we keep cards visible to avoid vanishing content.
+        if (lgUp) {
+          const revealBio = (el: HTMLDivElement | null, fromX: number, at: number) => {
+            if (!el) return;
+            tl.fromTo(el, { opacity: 0, x: fromX }, { opacity: 1, x: 0, duration: 0.06, ease: "power2.out" }, at);
+          };
+          revealBio(nameEl.current, -30, 0.355);
+          revealBio(locEl.current, 30, 0.48);
+          revealBio(skillsEl.current, -30, 0.605);
+          revealBio(aboutEl.current, 30, 0.705);
+        }
+
+        // Scan complete flash
+        const sc = scanComplete.current;
+        tl.to(sc, { opacity: 1, duration: 0.008 }, 0.8);
+        tl.to(sc, { opacity: 0, duration: 0.008 }, 0.81);
+        tl.to(sc, { opacity: 1, duration: 0.008 }, 0.82);
+        tl.to(sc, { opacity: 0, duration: 0.008 }, 0.83);
+        tl.to(sc, { opacity: 1, duration: 0.008 }, 0.84);
+
+        // Skills scatter toward project panels.
+        const spread = lgUp ? 560 : Math.max(120, Math.floor(window.innerWidth * 0.35));
+        const panelOffsets = lgUp
+          ? [
+              { dx: -spread, dy: 80 },
+              { dx: 0, dy: 80 },
+              { dx: spread, dy: 80 },
+            ]
+          : [
+              { dx: -spread, dy: 48 },
+              { dx: 0, dy: 56 },
+              { dx: spread, dy: 48 },
+            ];
+        const tags = section.current?.querySelectorAll(".skill-tag");
+        if (tags) {
+          tags.forEach((tag, i) => {
+            const target = panelOffsets[i % panelOffsets.length];
+            const rect = tag.getBoundingClientRect();
+            const cx = window.innerWidth / 2;
+            const cy = window.innerHeight / 2;
+            tl.to(
+              tag,
+              {
+                x: cx + target.dx - rect.left - rect.width / 2,
+                y: cy + target.dy - rect.top,
+                opacity: 0,
+                scale: 0.15,
+                duration: 0.1,
+                ease: "power2.in",
+              },
+              0.87 + i * 0.004,
+            );
+          });
+        }
+
+        // Fade scanner column only (image + HUD); bio cards stay visible for stacked/mobile layout
+        const scanCol = scannerColumnRef.current;
+        if (scanCol && lgUp) {
+          tl.to(scanCol, { opacity: 0, duration: 0.08, ease: "none" }, 0.92);
+        }
+
+        // Pin spacer changes scroll length; refresh so downstream ScrollTriggers + Lenis stay in sync.
+        requestAnimationFrame(() => {
+          ScrollTrigger.refresh();
+        });
+      }, section);
+    };
+
+    // Desktop: register pin in the same effect tick as siblings (below) mount their triggers.
+    // Mobile: double rAF keeps layout stable before measuring (JARVIS).
+    const desktopNow = window.matchMedia("(min-width: 1024px)").matches;
+    if (desktopNow) {
+      bootstrapGsap();
+    } else {
+      rafId = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (mobileBootstrapCancelled) return;
+          bootstrapGsap();
+        });
+      });
+    }
 
     return () => {
+      mobileBootstrapCancelled = true;
       removeMobileHeroScroll?.();
-      cancelAnimationFrame(rafId);
+      if (rafId !== undefined) cancelAnimationFrame(rafId);
       ctx?.revert();
       window.removeEventListener("error", resizeHandler);
     };
@@ -330,7 +359,7 @@ export default function HeroScannerSection() {
       <div
         ref={scannerWrap}
         id="scanner"
-        className="pointer-events-none absolute inset-0 z-20 max-lg:z-25 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-x-hidden opacity-0 max-lg:scroll-mt-[max(5.5rem,env(safe-area-inset-top)+4rem)] max-lg:items-start max-lg:justify-center max-lg:overflow-y-visible max-lg:px-3 max-lg:touch-pan-y lg:z-20 lg:scroll-mt-0 lg:touch-auto lg:overflow-y-auto xl:overflow-x-visible xl:overflow-y-visible"
+        className="pointer-events-none absolute inset-0 z-20 max-lg:z-25 flex max-xl:min-h-0 items-center justify-center overflow-x-hidden opacity-0 max-lg:scroll-mt-[max(5.5rem,env(safe-area-inset-top)+4rem)] max-lg:items-start max-lg:justify-center max-lg:overflow-y-visible max-lg:px-3 max-lg:touch-pan-y lg:z-20 lg:scroll-mt-0 lg:touch-auto lg:overflow-y-visible xl:overflow-x-visible xl:overflow-y-visible"
       >
         <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-4 pt-1 sm:px-4 sm:pb-8 max-lg:touch-pan-y max-lg:pt-[max(1.25rem,calc(env(safe-area-inset-top,12px)+6.5rem))] max-lg:pb-8 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:pt-0 xl:px-0">
           <div
