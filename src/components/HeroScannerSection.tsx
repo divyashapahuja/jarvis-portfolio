@@ -95,7 +95,9 @@ export default function HeroScannerSection() {
             trigger: section.current,
             start: "top top",
             end: "+=132%",
+            pin: true,
             scrub: 0.72,
+            anticipatePin: 1,
           },
         });
 
@@ -277,7 +279,7 @@ export default function HeroScannerSection() {
     <section
       ref={section}
       id="hero"
-      className="relative h-[100svh] w-full max-w-full overflow-x-hidden max-lg:overflow-y-visible max-lg:min-h-[232vh] lg:overflow-y-hidden lg:h-[100dvh] lg:min-h-[100svh] xl:overflow-x-visible"
+      className="relative h-[100svh] w-full max-w-full overflow-x-hidden max-lg:overflow-y-visible lg:overflow-y-hidden lg:h-[100dvh] lg:min-h-[100svh] xl:overflow-x-visible"
       style={{ background: "var(--background)" }}
     >
       <div className="absolute inset-0 bg-grid opacity-30" />
