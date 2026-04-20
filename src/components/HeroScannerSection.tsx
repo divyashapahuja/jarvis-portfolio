@@ -42,7 +42,7 @@ function BioCard({
   className = "",
 }: BioCardProps & { innerRef: React.Ref<HTMLDivElement>; className?: string }) {
   return (
-    <div ref={innerRef} className={`relative ${className}`}>
+    <div ref={innerRef} className={`relative max-lg:touch-pan-y ${className}`}>
       <div className="folder-tab">
         <FolderIcon />
         <span>{label}</span>
@@ -347,21 +347,21 @@ export default function HeroScannerSection() {
       <div
         ref={scannerWrap}
         id="scanner"
-        className="pointer-events-none absolute inset-0 z-20 max-lg:z-25 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-x-hidden opacity-0 max-lg:scroll-mt-[max(5.5rem,env(safe-area-inset-top)+4rem)] max-lg:items-start max-lg:justify-center max-lg:overflow-y-visible max-lg:px-3 lg:z-20 lg:scroll-mt-0 lg:overflow-y-auto xl:overflow-x-visible xl:overflow-y-visible"
+        className="pointer-events-none absolute inset-0 z-20 max-lg:z-25 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-x-hidden opacity-0 max-lg:scroll-mt-[max(5.5rem,env(safe-area-inset-top)+4rem)] max-lg:items-start max-lg:justify-center max-lg:overflow-y-visible max-lg:px-3 max-lg:touch-pan-y lg:z-20 lg:scroll-mt-0 lg:touch-auto lg:overflow-y-auto xl:overflow-x-visible xl:overflow-y-visible"
       >
-        <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-4 pt-1 sm:px-4 sm:pb-8 max-lg:pt-[max(1.25rem,calc(env(safe-area-inset-top,12px)+6.5rem))] max-lg:pb-8 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:pt-0 xl:px-0">
+        <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-4 pt-1 sm:px-4 sm:pb-8 max-lg:touch-pan-y max-lg:pt-[max(1.25rem,calc(env(safe-area-inset-top,12px)+6.5rem))] max-lg:pb-8 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:pt-0 xl:px-0">
           <div
             ref={scannerColumnRef}
-            className="relative w-full max-w-[380px] shrink-0 max-lg:mt-[min(44vh,20rem)] lg:mt-0 lg:pb-40 xl:absolute xl:left-1/2 xl:top-1/2 xl:max-w-none xl:w-auto xl:-translate-x-1/2 xl:-translate-y-1/2 xl:pb-0"
+            className="relative w-full max-w-[380px] shrink-0 max-lg:mt-[min(44vh,20rem)] max-lg:touch-pan-y lg:mt-0 lg:pb-40 lg:touch-auto xl:absolute xl:left-1/2 xl:top-1/2 xl:max-w-none xl:w-auto xl:-translate-x-1/2 xl:-translate-y-1/2 xl:pb-0"
           >
-            <div className="relative w-full max-lg:max-w-[260px] max-lg:mx-auto">
+            <div className="relative w-full max-lg:max-w-[260px] max-lg:mx-auto max-lg:touch-pan-y">
               <Image
                 src="/scanner.png"
                 alt="Character being scanned"
                 width={520}
                 height={680}
                 sizes="(max-width: 1023px) 90vw, 520px"
-                className="h-auto w-full max-w-full select-none xl:w-[520px]"
+                className="h-auto w-full max-w-full select-none max-lg:touch-pan-y xl:w-[520px]"
                 draggable={false}
               />
               <div
@@ -391,7 +391,7 @@ export default function HeroScannerSection() {
             </div>
 
             {/* Circular scan gauge */}
-            <div className="absolute bottom-[-84px] left-1/2 -translate-x-1/2 sm:bottom-[-120px] max-lg:static max-lg:mt-3 max-lg:w-full max-lg:flex max-lg:justify-center max-lg:translate-x-0">
+            <div className="absolute bottom-[-84px] left-1/2 -translate-x-1/2 sm:bottom-[-120px] max-lg:static max-lg:mt-3 max-lg:w-full max-lg:flex max-lg:touch-pan-y max-lg:justify-center max-lg:translate-x-0">
               <div className="relative" style={{ width: 90, height: 90 }}>
                 <svg width="90" height="90" viewBox="0 0 90 90" className="absolute inset-0">
                   <circle cx="45" cy="45" r={CIRCLE_R + 8} stroke="rgba(0,212,200,0.06)" strokeWidth="1" fill="none" />
@@ -435,7 +435,7 @@ export default function HeroScannerSection() {
           </div>
 
           {/* Bio cards — column below ~1280px; orbit HUD only on xl+ (avoids clipping inside overflow-hidden hero) */}
-          <div className="relative z-30 flex flex-col gap-3 w-full max-w-md mt-8 max-lg:z-40 max-lg:grid max-lg:grid-cols-2 max-lg:gap-2 max-lg:mt-3 max-lg:pb-2 max-lg:pointer-events-auto sm:max-w-lg max-xl:mt-8 xl:absolute xl:inset-0 xl:mt-0 xl:max-w-none xl:min-h-0 xl:pointer-events-none">
+          <div className="relative z-30 flex flex-col gap-3 w-full max-w-md mt-8 max-lg:z-40 max-lg:grid max-lg:grid-cols-2 max-lg:gap-2 max-lg:mt-3 max-lg:pb-2 max-lg:touch-pan-y sm:max-w-lg max-xl:mt-8 xl:absolute xl:inset-0 xl:mt-0 xl:max-w-none xl:min-h-0 xl:pointer-events-none">
             {/* xl+: anchor HUD to viewport center so cards stay in-frame on laptops (old negative left/right sat off-screen) */}
             <div className="w-full xl:pointer-events-auto xl:absolute xl:bottom-[12%] xl:left-[max(0.75rem,calc(50%-31rem))] xl:w-auto xl:max-w-[min(16rem,42vw)]">
               <BioCard label="Name" side="left" innerRef={nameEl}>
