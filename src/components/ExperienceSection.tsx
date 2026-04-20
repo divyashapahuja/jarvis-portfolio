@@ -164,16 +164,16 @@ export default function ExperienceSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const isPhone =
+      const isDesktop =
         typeof window !== "undefined" &&
-        window.matchMedia("(max-width: 767px)").matches;
-      const drawStroke = (el: SVGGeometryElement | null) => {
+        window.matchMedia("(min-width: 1024px)").matches;
+      const drawStroke = (el: SVGGeometryElement | null, oneShot: boolean) => {
         if (!el) return;
         const len = el.getTotalLength();
         if (!len || Number.isNaN(len)) return;
         el.style.strokeDasharray = `${len}`;
         el.style.strokeDashoffset = `${len}`;
-        if (isPhone) {
+        if (oneShot) {
           gsap.to(el, {
             strokeDashoffset: 0,
             ease: "power2.out",
@@ -198,8 +198,13 @@ export default function ExperienceSection() {
         }
       };
 
-      drawStroke(lineRef.current);
-      drawStroke(weaveRef.current);
+      // Keep desktop animation path aligned with reference:
+      // desktop animates only the center line, mobile animates only the weave path.
+      if (isDesktop) {
+        drawStroke(lineRef.current, false);
+      } else {
+        drawStroke(weaveRef.current, true);
+      }
     }, section);
 
     return () => ctx.revert();
@@ -207,6 +212,8 @@ export default function ExperienceSection() {
 
   const stDebounceRef = useRef<number | null>(null);
   useEffect(() => {
+    // Weave geometry updates are mobile-only; avoid desktop trigger re-inits.
+    if (lgUp) return;
     if (stDebounceRef.current) clearTimeout(stDebounceRef.current);
     stDebounceRef.current = window.setTimeout(() => {
       stDebounceRef.current = null;
@@ -226,31 +233,31 @@ export default function ExperienceSection() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       const cards = section.current?.querySelectorAll(".exp-card");
-      const isPhone =
+      const isDesktop =
         typeof window !== "undefined" &&
-        window.matchMedia("(max-width: 767px)").matches;
+        window.matchMedia("(min-width: 1024px)").matches;
       cards?.forEach((card, i) => {
         const isLeft = i % 2 === 0;
         gsap.fromTo(
           card,
-          isPhone ? { opacity: 0, y: 28 } : { opacity: 0, x: isLeft ? -60 : 60 },
+          isDesktop ? { opacity: 0, x: isLeft ? -60 : 60 } : { opacity: 0, y: 28 },
           {
             opacity: 1,
             x: 0,
             y: 0,
-            duration: isPhone ? 0.55 : 0.8,
+            duration: isDesktop ? 0.8 : 0.55,
             ease: "power2.out",
-            scrollTrigger: isPhone
+            scrollTrigger: isDesktop
               ? {
-                  trigger: card,
-                  start: "top 88%",
-                  toggleActions: "play none none reverse",
-                }
-              : {
                   trigger: card,
                   start: "top 80%",
                   end: "top 60%",
                   scrub: 1,
+                }
+              : {
+                  trigger: card,
+                  start: "top 88%",
+                  toggleActions: "play none none reverse",
                 },
           },
         );
