@@ -86,6 +86,7 @@ export default function HeroScannerSection() {
 
     let rafId: number;
     let ctx: ReturnType<typeof gsap.context>;
+    let removeMobileHeroScroll: (() => void) | undefined;
 
     // Double RAF ensures browser has completed layout/paint before GSAP measures anything.
     rafId = requestAnimationFrame(() => {
@@ -94,7 +95,8 @@ export default function HeroScannerSection() {
         ctx = gsap.context(() => {
       const lgUp = window.matchMedia("(min-width: 1024px)").matches;
 
-      // Mobile: short pinned scroll-driven transition (hero -> scanner) so it stays in-view.
+      // Mobile: drive intro with a paused timeline + passive scroll (no ScrollTrigger scrub).
+      // Scrubbed ST on touch competes with momentum scrolling and feels laggy / stuck.
       if (!lgUp) {
         gsap.set(heroContent.current, { opacity: 1, y: 0 });
         gsap.set(deskWrap.current, { opacity: 1 });
@@ -106,21 +108,8 @@ export default function HeroScannerSection() {
         if (circleProgress.current) gsap.set(circleProgress.current, { strokeDashoffset: CIRCUMFERENCE });
         const bioRefsMobile = [nameEl.current, locEl.current, skillsEl.current, aboutEl.current].filter(Boolean);
         if (bioRefsMobile.length) gsap.set(bioRefsMobile, { opacity: 1, x: 0 });
-        // Bio folder tweens are not scrubbed on mobile: unpinned ST often never reached the old reveal
-        // window (opacity stayed 0), and overflow-y-auto on this layer clipped folders below the fold.
-        const mobileTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: section.current,
-            start: "top top",
-            // Shorter range + tight scrub: long laggy scrub on touch fights native momentum scrolling.
-            end: "+=88%",
-            // Pinning the hero + opening a fixed full-screen layer reliably crashes Android Chrome
-            // ("The page couldn't load"). Scrub the same timeline without pin — scroll drives progress.
-            pin: false,
-            scrub: true,
-            fastScrollEnd: true,
-          },
-        });
+
+        const mobileTl = gsap.timeline({ paused: true });
 
         // Crossfade hero → scanner (opacity only — no layout offset).
         mobileTl.to(heroContent.current, { opacity: 0, duration: 0.26, ease: "power2.inOut" }, 0.05);
@@ -138,7 +127,7 @@ export default function HeroScannerSection() {
             0.26,
           );
         }
-        let t = 0.46;
+        const t = 0.46;
 
         // Skills scatter on mobile — fan out toward three panel positions then fade
         const mobileSpread = Math.max(80, Math.floor(window.innerWidth * 0.28));
@@ -163,6 +152,34 @@ export default function HeroScannerSection() {
         if (scannerColumnRef.current) {
           mobileTl.to(scannerColumnRef.current, { opacity: 0, duration: 0.06, ease: "none" }, t + 0.12);
         }
+
+        const scrollRange = () => Math.max(window.innerHeight * 0.82, 420);
+        const syncHeroScroll = () => {
+          const el = section.current;
+          if (!el) return;
+          const top = el.getBoundingClientRect().top;
+          const range = scrollRange();
+          const p = Math.min(1, Math.max(0, -top / range));
+          mobileTl.progress(p);
+        };
+
+        let scheduled = false;
+        const onScrollOrResize = () => {
+          if (scheduled) return;
+          scheduled = true;
+          requestAnimationFrame(() => {
+            scheduled = false;
+            syncHeroScroll();
+          });
+        };
+
+        window.addEventListener("scroll", onScrollOrResize, { passive: true });
+        window.addEventListener("resize", onScrollOrResize, { passive: true });
+        syncHeroScroll();
+        removeMobileHeroScroll = () => {
+          window.removeEventListener("scroll", onScrollOrResize);
+          window.removeEventListener("resize", onScrollOrResize);
+        };
 
         return;
       }
@@ -277,6 +294,7 @@ export default function HeroScannerSection() {
     }); // end outer RAF
 
     return () => {
+      removeMobileHeroScroll?.();
       cancelAnimationFrame(rafId);
       ctx?.revert();
       window.removeEventListener("error", resizeHandler);

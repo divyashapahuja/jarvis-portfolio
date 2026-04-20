@@ -168,24 +168,35 @@ export default function ExperienceSection() {
         typeof window !== "undefined" &&
         (window.matchMedia("(max-width: 1023px)").matches ||
           window.matchMedia("(pointer: coarse)").matches);
-      const lineScrub = touchCoarse ? true : 1;
       const drawStroke = (el: SVGGeometryElement | null) => {
         if (!el) return;
         const len = el.getTotalLength();
         if (!len || Number.isNaN(len)) return;
         el.style.strokeDasharray = `${len}`;
         el.style.strokeDashoffset = `${len}`;
-        gsap.to(el, {
-          strokeDashoffset: 0,
-          ease: "none",
-          scrollTrigger: {
-            trigger: section.current,
-            start: "top 70%",
-            end: "bottom 50%",
-            scrub: lineScrub,
-            fastScrollEnd: touchCoarse,
-          },
-        });
+        if (touchCoarse) {
+          gsap.to(el, {
+            strokeDashoffset: 0,
+            ease: "power2.out",
+            duration: 1.05,
+            scrollTrigger: {
+              trigger: section.current,
+              start: "top 70%",
+              toggleActions: "play none none reverse",
+            },
+          });
+        } else {
+          gsap.to(el, {
+            strokeDashoffset: 0,
+            ease: "none",
+            scrollTrigger: {
+              trigger: section.current,
+              start: "top 70%",
+              end: "bottom 50%",
+              scrub: 1,
+            },
+          });
+        }
       };
 
       drawStroke(lineRef.current);
@@ -221,7 +232,6 @@ export default function ExperienceSection() {
         typeof window !== "undefined" &&
         (window.matchMedia("(max-width: 1023px)").matches ||
           window.matchMedia("(pointer: coarse)").matches);
-      const cardScrub = touchCoarse ? true : 1;
       cards?.forEach((card, i) => {
         const isLeft = i % 2 === 0;
         gsap.fromTo(
@@ -231,15 +241,20 @@ export default function ExperienceSection() {
             opacity: 1,
             x: 0,
             y: 0,
-            duration: 0.8,
+            duration: touchCoarse ? 0.55 : 0.8,
             ease: "power2.out",
-            scrollTrigger: {
-              trigger: card,
-              start: "top 80%",
-              end: "top 60%",
-              scrub: cardScrub,
-              fastScrollEnd: touchCoarse,
-            },
+            scrollTrigger: touchCoarse
+              ? {
+                  trigger: card,
+                  start: "top 88%",
+                  toggleActions: "play none none reverse",
+                }
+              : {
+                  trigger: card,
+                  start: "top 80%",
+                  end: "top 60%",
+                  scrub: 1,
+                },
           },
         );
       });

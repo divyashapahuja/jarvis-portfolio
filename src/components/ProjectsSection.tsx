@@ -188,15 +188,20 @@ export default function ProjectsSection() {
         opacity: 0,
         scale: 0.95,
         y: 20,
-        duration: 1,
+        duration: touchCoarse ? 0.65 : 1,
         ease: "power2.out",
-        scrollTrigger: {
-          trigger: section.current,
-          start: "top 100%",
-          end: "top 90%",
-          scrub: touchCoarse ? true : 0.3,
-          fastScrollEnd: touchCoarse,
-        },
+        scrollTrigger: touchCoarse
+          ? {
+              trigger: section.current,
+              start: "top 92%",
+              toggleActions: "play none none reverse",
+            }
+          : {
+              trigger: section.current,
+              start: "top 100%",
+              end: "top 90%",
+              scrub: 0.3,
+            },
       });
     }, section);
     return () => ctx.revert();

@@ -218,7 +218,6 @@ export default function EducationSection() {
         typeof window !== "undefined" &&
         (window.matchMedia("(max-width: 1023px)").matches ||
           window.matchMedia("(pointer: coarse)").matches);
-      const rowScrub = touchCoarse ? true : 1;
       const rows = section.current?.querySelectorAll(".edu-hud-row");
       rows?.forEach((row) => {
         gsap.fromTo(
@@ -227,15 +226,20 @@ export default function EducationSection() {
           {
             opacity: 1,
             y: 0,
-            duration: 0.75,
+            duration: touchCoarse ? 0.5 : 0.75,
             ease: "power2.out",
-            scrollTrigger: {
-              trigger: row,
-              start: "top 88%",
-              end: "top 58%",
-              scrub: rowScrub,
-              fastScrollEnd: touchCoarse,
-            },
+            scrollTrigger: touchCoarse
+              ? {
+                  trigger: row,
+                  start: "top 90%",
+                  toggleActions: "play none none reverse",
+                }
+              : {
+                  trigger: row,
+                  start: "top 88%",
+                  end: "top 58%",
+                  scrub: 1,
+                },
           },
         );
 
@@ -248,21 +252,37 @@ export default function EducationSection() {
           return;
         }
         const endOffset = C * (1 - pct / 100);
-        gsap.fromTo(
-          arc,
-          { strokeDashoffset: C },
-          {
-            strokeDashoffset: endOffset,
-            ease: "none",
-            scrollTrigger: {
-              trigger: row,
-              start: "top 85%",
-              end: "top 45%",
-              scrub: rowScrub,
-              fastScrollEnd: touchCoarse,
+        if (touchCoarse) {
+          gsap.fromTo(
+            arc,
+            { strokeDashoffset: C },
+            {
+              strokeDashoffset: endOffset,
+              ease: "power2.out",
+              duration: 0.75,
+              scrollTrigger: {
+                trigger: row,
+                start: "top 88%",
+                toggleActions: "play none none reverse",
+              },
             },
-          },
-        );
+          );
+        } else {
+          gsap.fromTo(
+            arc,
+            { strokeDashoffset: C },
+            {
+              strokeDashoffset: endOffset,
+              ease: "none",
+              scrollTrigger: {
+                trigger: row,
+                start: "top 85%",
+                end: "top 45%",
+                scrub: 1,
+              },
+            },
+          );
+        }
       });
     }, section);
     return () => ctx.revert();

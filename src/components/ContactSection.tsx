@@ -97,24 +97,48 @@ export default function ContactSection() {
         typeof window !== "undefined" &&
         (window.matchMedia("(max-width: 1023px)").matches ||
           window.matchMedia("(pointer: coarse)").matches);
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section.current,
-          start: "top 65%",
-          end: "top 5%",
-          scrub: touchCoarse ? true : 1,
-          fastScrollEnd: touchCoarse,
-        },
-      });
 
-      tl.to(rings, { strokeDashoffset: 0, duration: 0.25, stagger: 0.04 }, 0);
-      if (arcs) tl.to(arcs, { strokeDashoffset: 0, duration: 0.2, stagger: 0.03 }, 0.05);
-      if (hudTicks) tl.fromTo(hudTicks, { opacity: 0 }, { opacity: 0.5, duration: 0.1, stagger: 0.005 }, 0.1);
-      if (hudDots) tl.fromTo(hudDots, { opacity: 0, scale: 0, transformOrigin: "center" }, { opacity: 1, scale: 1, duration: 0.08, stagger: 0.005 }, 0.15);
-      if (brackets) tl.fromTo(brackets, { opacity: 0 }, { opacity: 1, duration: 0.15, stagger: 0.05 }, 0.1);
-      tl.to(connectors, { strokeDashoffset: 0, duration: 0.2, stagger: 0.03 }, 0.3);
-      tl.fromTo(dots, { scale: 0, transformOrigin: "center" }, { scale: 1, duration: 0.12, stagger: 0.03, ease: "back.out(2)" }, 0.45);
-      tl.fromTo(labels, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.12, stagger: 0.03 }, 0.55);
+      const buildHudTimeline = () => {
+        const tl = gsap.timeline({ paused: true });
+        tl.to(rings, { strokeDashoffset: 0, duration: 0.25, stagger: 0.04 }, 0);
+        if (arcs) tl.to(arcs, { strokeDashoffset: 0, duration: 0.2, stagger: 0.03 }, 0.05);
+        if (hudTicks) tl.fromTo(hudTicks, { opacity: 0 }, { opacity: 0.5, duration: 0.1, stagger: 0.005 }, 0.1);
+        if (hudDots) tl.fromTo(hudDots, { opacity: 0, scale: 0, transformOrigin: "center" }, { opacity: 1, scale: 1, duration: 0.08, stagger: 0.005 }, 0.15);
+        if (brackets) tl.fromTo(brackets, { opacity: 0 }, { opacity: 1, duration: 0.15, stagger: 0.05 }, 0.1);
+        tl.to(connectors, { strokeDashoffset: 0, duration: 0.2, stagger: 0.03 }, 0.3);
+        tl.fromTo(dots, { scale: 0, transformOrigin: "center" }, { scale: 1, duration: 0.12, stagger: 0.03, ease: "back.out(2)" }, 0.45);
+        tl.fromTo(labels, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.12, stagger: 0.03 }, 0.55);
+        return tl;
+      };
+
+      if (touchCoarse) {
+        const tl = buildHudTimeline();
+        ScrollTrigger.create({
+          trigger: section.current,
+          start: "top 78%",
+          once: true,
+          onEnter: () => {
+            tl.timeScale(1.2).play(0);
+          },
+        });
+      } else {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section.current,
+            start: "top 65%",
+            end: "top 5%",
+            scrub: 1,
+          },
+        });
+        tl.to(rings, { strokeDashoffset: 0, duration: 0.25, stagger: 0.04 }, 0);
+        if (arcs) tl.to(arcs, { strokeDashoffset: 0, duration: 0.2, stagger: 0.03 }, 0.05);
+        if (hudTicks) tl.fromTo(hudTicks, { opacity: 0 }, { opacity: 0.5, duration: 0.1, stagger: 0.005 }, 0.1);
+        if (hudDots) tl.fromTo(hudDots, { opacity: 0, scale: 0, transformOrigin: "center" }, { opacity: 1, scale: 1, duration: 0.08, stagger: 0.005 }, 0.15);
+        if (brackets) tl.fromTo(brackets, { opacity: 0 }, { opacity: 1, duration: 0.15, stagger: 0.05 }, 0.1);
+        tl.to(connectors, { strokeDashoffset: 0, duration: 0.2, stagger: 0.03 }, 0.3);
+        tl.fromTo(dots, { scale: 0, transformOrigin: "center" }, { scale: 1, duration: 0.12, stagger: 0.03, ease: "back.out(2)" }, 0.45);
+        tl.fromTo(labels, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.12, stagger: 0.03 }, 0.55);
+      }
 
       gsap.to(svgRef.current, { rotation: 360, duration: 140, ease: "none", repeat: -1, transformOrigin: "center center" });
       gsap.to(".core-pulse", { opacity: 0.9, scale: 1.2, duration: 2.5, ease: "sine.inOut", repeat: -1, yoyo: true, transformOrigin: "center" });
