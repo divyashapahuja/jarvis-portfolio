@@ -164,16 +164,16 @@ export default function ExperienceSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const isDesktop =
+      const isPhone =
         typeof window !== "undefined" &&
-        window.matchMedia("(min-width: 1024px)").matches;
+        window.matchMedia("(max-width: 767px)").matches;
       const drawStroke = (el: SVGGeometryElement | null) => {
         if (!el) return;
         const len = el.getTotalLength();
         if (!len || Number.isNaN(len)) return;
         el.style.strokeDasharray = `${len}`;
         el.style.strokeDashoffset = `${len}`;
-        if (!isDesktop) {
+        if (isPhone) {
           gsap.to(el, {
             strokeDashoffset: 0,
             ease: "power2.out",
@@ -226,21 +226,21 @@ export default function ExperienceSection() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       const cards = section.current?.querySelectorAll(".exp-card");
-      const isDesktop =
+      const isPhone =
         typeof window !== "undefined" &&
-        window.matchMedia("(min-width: 1024px)").matches;
+        window.matchMedia("(max-width: 767px)").matches;
       cards?.forEach((card, i) => {
         const isLeft = i % 2 === 0;
         gsap.fromTo(
           card,
-          isDesktop ? { opacity: 0, x: isLeft ? -60 : 60 } : { opacity: 0, y: 28 },
+          isPhone ? { opacity: 0, y: 28 } : { opacity: 0, x: isLeft ? -60 : 60 },
           {
             opacity: 1,
             x: 0,
             y: 0,
-            duration: isDesktop ? 0.8 : 0.55,
+            duration: isPhone ? 0.55 : 0.8,
             ease: "power2.out",
-            scrollTrigger: !isDesktop
+            scrollTrigger: isPhone
               ? {
                   trigger: card,
                   start: "top 88%",

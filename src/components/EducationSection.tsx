@@ -214,9 +214,9 @@ export default function EducationSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const isDesktop =
+      const isPhone =
         typeof window !== "undefined" &&
-        window.matchMedia("(min-width: 1024px)").matches;
+        window.matchMedia("(max-width: 767px)").matches;
       const rows = section.current?.querySelectorAll(".edu-hud-row");
       rows?.forEach((row) => {
         gsap.fromTo(
@@ -225,9 +225,9 @@ export default function EducationSection() {
           {
             opacity: 1,
             y: 0,
-            duration: isDesktop ? 0.75 : 0.5,
+            duration: isPhone ? 0.5 : 0.75,
             ease: "power2.out",
-            scrollTrigger: !isDesktop
+            scrollTrigger: isPhone
               ? {
                   trigger: row,
                   start: "top 90%",
@@ -251,7 +251,7 @@ export default function EducationSection() {
           return;
         }
         const endOffset = C * (1 - pct / 100);
-        if (!isDesktop) {
+        if (isPhone) {
           gsap.fromTo(
             arc,
             { strokeDashoffset: C },

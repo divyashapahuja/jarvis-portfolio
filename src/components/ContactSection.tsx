@@ -93,9 +93,9 @@ export default function ContactSection() {
         path.style.strokeDashoffset = `${len}`;
       });
 
-      const isDesktop =
+      const isPhone =
         typeof window !== "undefined" &&
-        window.matchMedia("(min-width: 1024px)").matches;
+        window.matchMedia("(max-width: 767px)").matches;
 
       const buildHudTimeline = () => {
         const tl = gsap.timeline({ paused: true });
@@ -110,7 +110,7 @@ export default function ContactSection() {
         return tl;
       };
 
-      if (!isDesktop) {
+      if (isPhone) {
         const tl = buildHudTimeline();
         ScrollTrigger.create({
           trigger: section.current,
