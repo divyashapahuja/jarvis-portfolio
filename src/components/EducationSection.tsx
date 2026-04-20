@@ -235,8 +235,8 @@ export default function EducationSection() {
                 }
               : {
                   trigger: row,
-                  start: "top 88%",
-                  end: "top 22%",
+                  start: "top bottom",
+                  end: "bottom top",
                   scrub: 1,
                 },
           },
@@ -275,8 +275,8 @@ export default function EducationSection() {
               ease: "none",
               scrollTrigger: {
                 trigger: row,
-                start: "top 85%",
-                end: "top 15%",
+                start: "top bottom",
+                end: "bottom top",
                 scrub: 1,
               },
             },

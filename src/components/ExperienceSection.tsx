@@ -190,8 +190,8 @@ export default function ExperienceSection() {
             ease: "none",
             scrollTrigger: {
               trigger: section.current,
-              start: "top 70%",
-              end: "bottom 20%",
+              start: "top bottom",
+              end: "bottom top",
               scrub: 1,
             },
           });
@@ -249,8 +249,8 @@ export default function ExperienceSection() {
                 }
               : {
                   trigger: card,
-                  start: "top 80%",
-                  end: "top 30%",
+                  start: "top bottom",
+                  end: "bottom top",
                   scrub: 1,
                 },
           },
