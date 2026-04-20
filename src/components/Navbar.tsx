@@ -88,10 +88,18 @@ export default function Navbar() {
         window.matchMedia("(max-width: 1023px)").matches);
     const scrollBehavior: ScrollBehavior = prefersCoarse ? "auto" : "smooth";
 
-    // Always scroll to the actual section id from the nav link.
-    // For "About", this is #scan-complete (100% scanner marker).
-    const el = document.querySelector(link.href);
-    if (el) el.scrollIntoView({ behavior: scrollBehavior, block: "start" });
+    // About: snap to the scan-complete HUD marker with a slight top offset so
+    // users land where the scanner is visibly completed, not hero top.
+    if (link.scrollToScanComplete) {
+      const el = document.querySelector(link.href);
+      if (el) {
+        const top = window.scrollY + el.getBoundingClientRect().top - window.innerHeight * 0.18;
+        window.scrollTo({ top: Math.max(0, top), behavior: scrollBehavior });
+      }
+    } else {
+      const el = document.querySelector(link.href);
+      if (el) el.scrollIntoView({ behavior: scrollBehavior, block: "start" });
+    }
     setMenuOpen(false);
   }, []);
 
