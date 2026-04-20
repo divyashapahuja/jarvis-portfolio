@@ -164,16 +164,16 @@ export default function ExperienceSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const touchCoarse =
+      const isDesktop =
         typeof window !== "undefined" &&
-        window.matchMedia("(max-width: 1023px)").matches;
+        window.matchMedia("(min-width: 1024px)").matches;
       const drawStroke = (el: SVGGeometryElement | null) => {
         if (!el) return;
         const len = el.getTotalLength();
         if (!len || Number.isNaN(len)) return;
         el.style.strokeDasharray = `${len}`;
         el.style.strokeDashoffset = `${len}`;
-        if (touchCoarse) {
+        if (!isDesktop) {
           gsap.to(el, {
             strokeDashoffset: 0,
             ease: "power2.out",
@@ -226,22 +226,21 @@ export default function ExperienceSection() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       const cards = section.current?.querySelectorAll(".exp-card");
-      const lgUp = typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches;
-      const touchCoarse =
+      const isDesktop =
         typeof window !== "undefined" &&
-        window.matchMedia("(max-width: 1023px)").matches;
+        window.matchMedia("(min-width: 1024px)").matches;
       cards?.forEach((card, i) => {
         const isLeft = i % 2 === 0;
         gsap.fromTo(
           card,
-          lgUp ? { opacity: 0, x: isLeft ? -60 : 60 } : { opacity: 0, y: 28 },
+          isDesktop ? { opacity: 0, x: isLeft ? -60 : 60 } : { opacity: 0, y: 28 },
           {
             opacity: 1,
             x: 0,
             y: 0,
-            duration: touchCoarse ? 0.55 : 0.8,
+            duration: isDesktop ? 0.8 : 0.55,
             ease: "power2.out",
-            scrollTrigger: touchCoarse
+            scrollTrigger: !isDesktop
               ? {
                   trigger: card,
                   start: "top 88%",

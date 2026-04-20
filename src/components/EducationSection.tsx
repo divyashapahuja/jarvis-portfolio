@@ -214,9 +214,9 @@ export default function EducationSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const touchCoarse =
+      const isDesktop =
         typeof window !== "undefined" &&
-        window.matchMedia("(max-width: 1023px)").matches;
+        window.matchMedia("(min-width: 1024px)").matches;
       const rows = section.current?.querySelectorAll(".edu-hud-row");
       rows?.forEach((row) => {
         gsap.fromTo(
@@ -225,9 +225,9 @@ export default function EducationSection() {
           {
             opacity: 1,
             y: 0,
-            duration: touchCoarse ? 0.5 : 0.75,
+            duration: isDesktop ? 0.75 : 0.5,
             ease: "power2.out",
-            scrollTrigger: touchCoarse
+            scrollTrigger: !isDesktop
               ? {
                   trigger: row,
                   start: "top 90%",
@@ -251,7 +251,7 @@ export default function EducationSection() {
           return;
         }
         const endOffset = C * (1 - pct / 100);
-        if (touchCoarse) {
+        if (!isDesktop) {
           gsap.fromTo(
             arc,
             { strokeDashoffset: C },
