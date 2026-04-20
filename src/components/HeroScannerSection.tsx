@@ -74,7 +74,11 @@ export default function HeroScannerSection() {
   const aboutEl = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
+    let rafId: number;
+    let ctx: ReturnType<typeof gsap.context>;
+
+    rafId = requestAnimationFrame(() => {
+      ctx = gsap.context(() => {
       const lgUp = window.matchMedia("(min-width: 1024px)").matches;
 
       // Mobile: short pinned scroll-driven transition (hero -> scanner) so it stays in-view.
@@ -271,8 +275,12 @@ export default function HeroScannerSection() {
         tl.to(scanCol, { opacity: 0, duration: 0.08, ease: "none" }, 0.92);
       }
     }, section);
+    }); // end requestAnimationFrame
 
-    return () => ctx.revert();
+    return () => {
+      cancelAnimationFrame(rafId);
+      ctx?.revert();
+    };
   }, []);
 
   return (
