@@ -93,12 +93,17 @@ export default function ContactSection() {
         path.style.strokeDashoffset = `${len}`;
       });
 
+      const touchCoarse =
+        typeof window !== "undefined" &&
+        (window.matchMedia("(max-width: 1023px)").matches ||
+          window.matchMedia("(pointer: coarse)").matches);
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section.current,
           start: "top 65%",
           end: "top 5%",
-          scrub: 1,
+          scrub: touchCoarse ? true : 1,
+          fastScrollEnd: touchCoarse,
         },
       });
 

@@ -112,11 +112,13 @@ export default function HeroScannerSection() {
           scrollTrigger: {
             trigger: section.current,
             start: "top top",
-            end: "+=132%",
+            // Shorter range + tight scrub: long laggy scrub on touch fights native momentum scrolling.
+            end: "+=88%",
             // Pinning the hero + opening a fixed full-screen layer reliably crashes Android Chrome
             // ("The page couldn't load"). Scrub the same timeline without pin — scroll drives progress.
             pin: false,
-            scrub: 0.72,
+            scrub: true,
+            fastScrollEnd: true,
           },
         });
 
@@ -327,7 +329,7 @@ export default function HeroScannerSection() {
       <div
         ref={scannerWrap}
         id="scanner"
-        className="pointer-events-none absolute inset-0 z-20 max-lg:z-25 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-x-hidden opacity-0 max-lg:items-start max-lg:justify-center max-lg:overflow-y-visible max-lg:px-3 lg:z-20 lg:overflow-y-auto xl:overflow-x-visible xl:overflow-y-visible"
+        className="pointer-events-none absolute inset-0 z-20 max-lg:z-25 flex max-xl:min-h-0 max-xl:overscroll-contain items-center justify-center overflow-x-hidden opacity-0 max-lg:scroll-mt-[max(5.5rem,env(safe-area-inset-top)+4rem)] max-lg:items-start max-lg:justify-center max-lg:overflow-y-visible max-lg:px-3 lg:z-20 lg:scroll-mt-0 lg:overflow-y-auto xl:overflow-x-visible xl:overflow-y-visible"
       >
         <div className="relative flex w-full min-w-0 max-w-full flex-col items-center px-3 pb-4 pt-1 sm:px-4 sm:pb-8 max-lg:pt-[max(1.25rem,calc(env(safe-area-inset-top,12px)+6.5rem))] max-lg:pb-8 xl:absolute xl:inset-0 xl:max-w-none xl:justify-center xl:overflow-visible xl:pb-0 xl:pt-0 xl:px-0">
           <div
@@ -440,7 +442,12 @@ export default function HeroScannerSection() {
             </div>
 
             <div className="w-full xl:pointer-events-auto xl:absolute xl:bottom-[70%] xl:right-[max(0.75rem,calc(50%-33rem))] xl:w-auto xl:max-w-[min(18rem,44vw)]">
-              <BioCard label="About" side="right" innerRef={aboutEl}>
+              <BioCard
+                label="About"
+                side="right"
+                innerRef={aboutEl}
+                className="max-lg:[&_.folder-body]:max-h-[min(38vh,16rem)] max-lg:[&_.folder-body]:overflow-y-auto max-lg:[&_.folder-body]:overscroll-y-contain max-lg:[&_.folder-body]:touch-pan-y"
+              >
                 <p className="leading-relaxed text-white/80 max-lg:text-[0.75rem] sm:max-w-[260px] lg:max-w-[200px] xl:max-w-none" style={{ fontFamily: "Orbitron, sans-serif", fontSize: "1rem" }}>{BIO.about}</p>
               </BioCard>
             </div>

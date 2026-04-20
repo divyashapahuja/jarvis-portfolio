@@ -164,6 +164,11 @@ export default function ExperienceSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      const touchCoarse =
+        typeof window !== "undefined" &&
+        (window.matchMedia("(max-width: 1023px)").matches ||
+          window.matchMedia("(pointer: coarse)").matches);
+      const lineScrub = touchCoarse ? true : 1;
       const drawStroke = (el: SVGGeometryElement | null) => {
         if (!el) return;
         const len = el.getTotalLength();
@@ -177,7 +182,8 @@ export default function ExperienceSection() {
             trigger: section.current,
             start: "top 70%",
             end: "bottom 50%",
-            scrub: 1,
+            scrub: lineScrub,
+            fastScrollEnd: touchCoarse,
           },
         });
       };
@@ -211,6 +217,11 @@ export default function ExperienceSection() {
     const ctx = gsap.context(() => {
       const cards = section.current?.querySelectorAll(".exp-card");
       const lgUp = typeof window !== "undefined" && window.matchMedia("(min-width: 1024px)").matches;
+      const touchCoarse =
+        typeof window !== "undefined" &&
+        (window.matchMedia("(max-width: 1023px)").matches ||
+          window.matchMedia("(pointer: coarse)").matches);
+      const cardScrub = touchCoarse ? true : 1;
       cards?.forEach((card, i) => {
         const isLeft = i % 2 === 0;
         gsap.fromTo(
@@ -226,7 +237,8 @@ export default function ExperienceSection() {
               trigger: card,
               start: "top 80%",
               end: "top 60%",
-              scrub: 1,
+              scrub: cardScrub,
+              fastScrollEnd: touchCoarse,
             },
           },
         );

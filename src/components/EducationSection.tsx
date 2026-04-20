@@ -214,6 +214,11 @@ export default function EducationSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      const touchCoarse =
+        typeof window !== "undefined" &&
+        (window.matchMedia("(max-width: 1023px)").matches ||
+          window.matchMedia("(pointer: coarse)").matches);
+      const rowScrub = touchCoarse ? true : 1;
       const rows = section.current?.querySelectorAll(".edu-hud-row");
       rows?.forEach((row) => {
         gsap.fromTo(
@@ -228,7 +233,8 @@ export default function EducationSection() {
               trigger: row,
               start: "top 88%",
               end: "top 58%",
-              scrub: 1,
+              scrub: rowScrub,
+              fastScrollEnd: touchCoarse,
             },
           },
         );
@@ -252,7 +258,8 @@ export default function EducationSection() {
               trigger: row,
               start: "top 85%",
               end: "top 45%",
-              scrub: 1,
+              scrub: rowScrub,
+              fastScrollEnd: touchCoarse,
             },
           },
         );

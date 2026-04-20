@@ -82,6 +82,12 @@ export default function Navbar() {
   }, [menuOpen]);
 
   const handleClick = useCallback((link: NavLink) => {
+    const prefersCoarse =
+      typeof window !== "undefined" &&
+      (window.matchMedia("(pointer: coarse)").matches ||
+        window.matchMedia("(max-width: 1023px)").matches);
+    const scrollBehavior: ScrollBehavior = prefersCoarse ? "auto" : "smooth";
+
     if (link.scrollToScanComplete) {
       const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
       if (isDesktop) {
@@ -89,11 +95,11 @@ export default function Navbar() {
         window.scrollTo({ top: target, behavior: "smooth" });
       } else {
         const el = document.querySelector(link.href);
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (el) el.scrollIntoView({ behavior: scrollBehavior, block: "start" });
       }
     } else {
       const el = document.querySelector(link.href);
-      if (el) el.scrollIntoView({ behavior: "smooth" });
+      if (el) el.scrollIntoView({ behavior: scrollBehavior, block: "start" });
     }
     setMenuOpen(false);
   }, []);

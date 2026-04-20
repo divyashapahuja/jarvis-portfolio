@@ -180,6 +180,10 @@ export default function ProjectsSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      const touchCoarse =
+        typeof window !== "undefined" &&
+        (window.matchMedia("(max-width: 1023px)").matches ||
+          window.matchMedia("(pointer: coarse)").matches);
       gsap.from(stage.current, {
         opacity: 0,
         scale: 0.95,
@@ -190,7 +194,8 @@ export default function ProjectsSection() {
           trigger: section.current,
           start: "top 100%",
           end: "top 90%",
-          scrub: 0.3,
+          scrub: touchCoarse ? true : 0.3,
+          fastScrollEnd: touchCoarse,
         },
       });
     }, section);
