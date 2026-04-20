@@ -88,19 +88,10 @@ export default function Navbar() {
         window.matchMedia("(max-width: 1023px)").matches);
     const scrollBehavior: ScrollBehavior = prefersCoarse ? "auto" : "smooth";
 
-    if (link.scrollToScanComplete) {
-      const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
-      if (isDesktop) {
-        const target = 0.80 * 2.0 * window.innerHeight;
-        window.scrollTo({ top: target, behavior: "smooth" });
-      } else {
-        const el = document.querySelector(link.href);
-        if (el) el.scrollIntoView({ behavior: scrollBehavior, block: "start" });
-      }
-    } else {
-      const el = document.querySelector(link.href);
-      if (el) el.scrollIntoView({ behavior: scrollBehavior, block: "start" });
-    }
+    // Always scroll to the actual section id from the nav link.
+    // For "About", this is #scanner (not a computed hero offset).
+    const el = document.querySelector(link.href);
+    if (el) el.scrollIntoView({ behavior: scrollBehavior, block: "start" });
     setMenuOpen(false);
   }, []);
 
