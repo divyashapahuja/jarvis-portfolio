@@ -91,10 +91,21 @@ export default function Navbar() {
     // About: snap to the scan-complete HUD marker with a slight top offset so
     // users land where the scanner is visibly completed, not hero top.
     if (link.scrollToScanComplete) {
-      const el = document.querySelector(link.href);
-      if (el) {
-        const top = window.scrollY + el.getBoundingClientRect().top - window.innerHeight * 0.18;
-        window.scrollTo({ top: Math.max(0, top), behavior: scrollBehavior });
+      const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+      if (isDesktop) {
+        const hero = document.querySelector("#hero");
+        if (hero) {
+          // Desktop hero runs a long pinned sequence; ~1.6vh from hero start lands near scan complete.
+          const heroTop = window.scrollY + hero.getBoundingClientRect().top;
+          const target = heroTop + window.innerHeight * 1.6;
+          window.scrollTo({ top: Math.max(0, target), behavior: scrollBehavior });
+        }
+      } else {
+        const el = document.querySelector(link.href);
+        if (el) {
+          const top = window.scrollY + el.getBoundingClientRect().top - window.innerHeight * 0.18;
+          window.scrollTo({ top: Math.max(0, top), behavior: scrollBehavior });
+        }
       }
     } else {
       const el = document.querySelector(link.href);

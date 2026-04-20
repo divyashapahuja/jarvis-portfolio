@@ -125,7 +125,7 @@ export default function ContactSection() {
           scrollTrigger: {
             trigger: section.current,
             start: "top 65%",
-            end: "top 5%",
+            end: "bottom 10%",
             scrub: 1,
           },
         });
